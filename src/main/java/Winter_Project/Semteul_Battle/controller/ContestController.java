@@ -18,6 +18,7 @@ public class ContestController {
     @GetMapping("/id-designate")
     public boolean idDesignate(@RequestParam("loginId") String loginId,
                                @RequestHeader("Authorization") String token) {
+
         return userRepository.existsByLoginId(loginId);
     }
 }
