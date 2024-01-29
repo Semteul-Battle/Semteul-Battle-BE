@@ -1,0 +1,74 @@
+package Winter_Project.Semteul_Battle.util;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.stereotype.Component;
+
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
+@Component
+@RequiredArgsConstructor
+public class RedisUtil {
+
+    private final StringRedisTemplate stringRedisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisBlackListTemplate;
+
+    public void set(String key, Object o, int minutes) {
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer(o.getClass()));
+        redisTemplate.opsForValue().set(key, o, minutes, TimeUnit.MINUTES);
+    }
+
+    public Object get(String key) {
+        return redisTemplate.opsForValue().get(key);
+    }
+
+    public boolean delete(String key) {
+        return redisTemplate.delete(key);
+    }
+
+    public boolean hasKey(String key) {
+        return redisTemplate.hasKey(key);
+    }
+
+    public void setBlackList(String key, Object o, Long milliSeconds) {
+        redisBlackListTemplate.setValueSerializer(new Jackson2JsonRedisSerializer(o.getClass()));
+        redisBlackListTemplate.opsForValue().set(key, o, milliSeconds, TimeUnit.MILLISECONDS);
+    }
+
+    public Object getBlackList(String key) {
+        return redisBlackListTemplate.opsForValue().get(key);
+    }
+
+    public boolean deleteBlackList(String key) {
+        return redisBlackListTemplate.delete(key);
+    }
+
+    public boolean hasKeyBlackList(String key) {
+        return redisBlackListTemplate.hasKey(key);
+    }
+
+    public String getData(String key) {
+        ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
+        return valueOperations.get(key);
+    }
+
+    public void setData(String key, String value) {
+        ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
+        valueOperations.set(key, value);
+    }
+
+    public void setDataExpire(String key, String value, long duration) {
+        ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
+        Duration expireDuration = Duration.ofSeconds(duration);
+        valueOperations.set(key, value, expireDuration);
+    }
+
+    public void deleteData(String key) {
+        stringRedisTemplate.delete(key);
+    }
+}
