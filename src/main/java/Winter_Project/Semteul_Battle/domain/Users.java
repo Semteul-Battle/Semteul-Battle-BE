@@ -67,7 +67,7 @@ public class Users implements UserDetails {
     private List<contestNotice> contestNotices;
 
     @OneToMany(mappedBy = "users")
-    private List<examiner> examiners;
+    private List<Examiner> Examiners;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default

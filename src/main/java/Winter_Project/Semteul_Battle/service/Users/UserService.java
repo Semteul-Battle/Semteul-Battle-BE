@@ -1,6 +1,7 @@
 package Winter_Project.Semteul_Battle.service.Users;
 
 import Winter_Project.Semteul_Battle.config.jwt.JwtTokenProvider;
+import Winter_Project.Semteul_Battle.domain.Users;
 import Winter_Project.Semteul_Battle.dto.JwtToken;
 import Winter_Project.Semteul_Battle.dto.Users.SignUpDto;
 import Winter_Project.Semteul_Battle.dto.Users.UserDto;
@@ -55,6 +56,11 @@ public class UserService implements UserServiceImpl {
         JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
 
         return jwtToken;
+    }
+
+    public Users getUserByUsername(String loginId) {
+        return userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + loginId));
     }
 
 

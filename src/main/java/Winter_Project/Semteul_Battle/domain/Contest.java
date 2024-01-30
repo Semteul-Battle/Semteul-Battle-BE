@@ -31,7 +31,7 @@ public class Contest {
     private Timestamp endTime;
 
     @Lob
-    @Column(nullable = false) // 문제 해설 pdf 파일
+    @Column(nullable = true, columnDefinition = "BLOB") // 문제 해설 pdf 파일
     private byte[] solution;
 
     // 외래키로 사용하는 경우
@@ -45,7 +45,13 @@ public class Contest {
     private List<contestNotice> contestNotices;
 
     @OneToMany(mappedBy = "contest")
-    private List<examiner> examiner;
+    private List<Examiner> examiner;
+
+    public Contest(Long id) {
+        this.id = id;
+    }
+
+
 
 
 

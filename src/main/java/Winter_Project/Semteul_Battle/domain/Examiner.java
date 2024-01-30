@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class examiner {
+public class Examiner {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

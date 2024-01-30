@@ -37,6 +37,8 @@ public class EmailService {
                 + "인증번호는 " + "[ " + code + " ]" + "입니다.\n"
                 + "인증번호 인증 후 회원가입을 완료하시면 됩니다.");
         dto.setVerificationCode(code);
+
+        System.out.println("회원가입 토큰" + code);
         return dto;
     }
 
