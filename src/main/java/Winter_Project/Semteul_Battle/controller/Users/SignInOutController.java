@@ -16,10 +16,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @Slf4j
@@ -70,30 +67,20 @@ public class SignInOutController {
     // 로그아웃
     // loginId 주입 필요
     @PostMapping("/sign-out")
-    public boolean signOut(@RequestBody SignOutDto signOutDto, HttpServletRequest request, HttpServletResponse response) {
-        // 클라이언트로부터 받은 모든 쿠키를 가져옴
-        Cookie[] cookies = request.getCookies();
+    public boolean signOut(@RequestBody SignOutDto signOutDto, @RequestHeader("Authorization") String token) {
+        if (token != null && token.startsWith("Bearer")) {
+            String accessToken = token.substring(7); // "Bearer " 다음의 부분이 accessToken
 
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                // "accessToken" 쿠키를 찾아서 제거
-                if ("accessToken".equals(cookie.getName())) {
-                    cookie.setMaxAge(0); // 만료 시간을 0으로 설정하여 쿠키를 삭제
-                    cookie.setPath("/"); // 쿠키의 경로를 설정
-                    response.addCookie(cookie); // 응답에 변경된 쿠키를 추가
+            // redisDB에 저장된 리프레시 토큰을 삭제
+            redisUtil.deleteData(signOutDto.getLoginId());
 
-                    // redisDB에 저장된 리프레시 토큰을 삭제
-                    redisUtil.deleteData(signOutDto.getLoginId());
+            // AccessToken을 블랙리스트에 추가하여 만료시키기
+            Long expiration = jwtTokenProvider.getExpiration(accessToken);
+            redisUtil.setBlackList(accessToken, "access_token", expiration);
 
-                    // AccessToken을 블랙리스트에 추가하여 만료시키기
-                    String accessToken = cookie.getValue();
-                    Long expiration = jwtTokenProvider.getExpiration(accessToken);
-                    redisUtil.setBlackList(accessToken, "access_token", expiration);
-                    // 로그아웃 후에는 SecurityContext를 클리어해줘야 합니다.
-                    SecurityContextHolder.clearContext();
-                    return true;
-                }
-            }
+            // 로그아웃 후에는 SecurityContext를 클리어해줘야 합니다.
+            SecurityContextHolder.clearContext();
+            return true;
         }
         return false;
     }
