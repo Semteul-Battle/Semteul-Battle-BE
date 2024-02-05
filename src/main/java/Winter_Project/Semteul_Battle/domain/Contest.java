@@ -1,5 +1,6 @@
 package Winter_Project.Semteul_Battle.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,30 +30,30 @@ public class Contest {
 
     @Column(nullable= false) // 종료일
     private Timestamp endTime;
-
+    @Column(nullable = true)
+    private Long contestHost; // 0 - 미완(어드민), 1 - 미완(출제자), 2 - 완성(일반 사용자)
     @Lob
     @Column(nullable = true, columnDefinition = "BLOB") // 문제 해설 pdf 파일
     private byte[] solution;
 
     // 외래키로 사용하는 경우
+    @JsonIgnore
     @OneToMany(mappedBy = "contest")
     private List<Problem> problems;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "contest")
     private List<ContestantContest> contestantContests;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "contest")
     private List<contestNotice> contestNotices;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "contest")
     private List<Examiner> examiner;
 
     public Contest(Long id) {
         this.id = id;
     }
-
-
-
-
-
 }

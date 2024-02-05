@@ -1,4 +1,4 @@
-package Winter_Project.Semteul_Battle.service;
+package Winter_Project.Semteul_Battle.service.Email;
 
 import Winter_Project.Semteul_Battle.dto.MailDto;
 import Winter_Project.Semteul_Battle.util.RedisUtil;

@@ -4,7 +4,7 @@ import Winter_Project.Semteul_Battle.domain.Users;
 import Winter_Project.Semteul_Battle.dto.MailDto;
 import Winter_Project.Semteul_Battle.repository.UserRepository;
 import Winter_Project.Semteul_Battle.service.Users.CustomUserDetailsService;
-import Winter_Project.Semteul_Battle.service.EmailService;
+import Winter_Project.Semteul_Battle.service.Email.EmailService;
 import Winter_Project.Semteul_Battle.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
