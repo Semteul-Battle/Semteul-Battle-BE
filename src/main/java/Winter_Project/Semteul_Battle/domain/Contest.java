@@ -19,19 +19,27 @@ public class Contest {
     @Column(updatable = false, unique = true, nullable = false)
     private Long id;
 
-    @Column(name = "name", nullable= false) // 대회 이름
+    @Column(name = "name", nullable = false) // 대회 이름
     private String contestName;
 
     @Column(name = "Authority", nullable = false) // 대회 참여 권한
     private Long enterAuthority; // 1 - 부원, 2 - 전체
 
-    @Column(nullable= false) // 시작일
+    @Column(nullable = false) // 시작일
     private Timestamp startTime;
 
-    @Column(nullable= false) // 종료일
+    @Column(nullable = false) // 종료일
     private Timestamp endTime;
+
+    @Column(nullable = true)
+    private String simpleInfo; // 간략 정보
+
+    @Column(nullable = true)
+    private String problemInfo; // 문제 설명
+
     @Column(nullable = true)
     private Long contestHost; // 0 - 미완(어드민), 1 - 미완(출제자), 2 - 완성(일반 사용자)
+
     @Lob
     @Column(nullable = true, columnDefinition = "BLOB") // 문제 해설 pdf 파일
     private byte[] solution;
@@ -56,4 +64,9 @@ public class Contest {
     public Contest(Long id) {
         this.id = id;
     }
+
+
+
+
+
 }

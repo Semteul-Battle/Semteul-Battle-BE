@@ -14,11 +14,15 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 public class CreateContestDto {
+
     private String contestName;
     private List<String> examinerUsernames;
     private Long enterAuthority;
+
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
     private Timestamp startTime;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
     private Timestamp endTime;
+
+    private Long contestHost;
 }
