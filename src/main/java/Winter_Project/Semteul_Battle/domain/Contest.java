@@ -37,7 +37,7 @@ public class Contest {
     private String problemInfo; // 문제 설명
 
     @Column(nullable = true)
-    private Long contestHost; // 0 - 미완, 1 - 완성
+    private Long contestHost; // 0 - 미완(어드민), 1 - 미완(출제자), 2 - 완성(일반 사용자)
 
     @Lob
     @Column(nullable = true, columnDefinition = "BLOB") // 문제 해설 pdf 파일
@@ -59,6 +59,4 @@ public class Contest {
     public Contest(Long id) {
         this.id = id;
     }
-
-
 }
