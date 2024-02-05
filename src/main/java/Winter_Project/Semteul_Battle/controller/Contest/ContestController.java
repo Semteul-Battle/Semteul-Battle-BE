@@ -1,4 +1,4 @@
-package Winter_Project.Semteul_Battle.controller;
+package Winter_Project.Semteul_Battle.controller.Contest;
 
 import Winter_Project.Semteul_Battle.domain.Contest;
 import Winter_Project.Semteul_Battle.domain.Examiner;

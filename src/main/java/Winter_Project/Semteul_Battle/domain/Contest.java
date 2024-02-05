@@ -1,5 +1,6 @@
 package Winter_Project.Semteul_Battle.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -44,19 +45,28 @@ public class Contest {
     private byte[] solution;
 
     // 외래키로 사용하는 경우
+    @JsonIgnore
     @OneToMany(mappedBy = "contest")
     private List<Problem> problems;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "contest")
     private List<ContestantContest> contestantContests;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "contest")
     private List<contestNotice> contestNotices;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "contest")
     private List<Examiner> examiner;
 
     public Contest(Long id) {
         this.id = id;
     }
+
+
+
+
+
 }
