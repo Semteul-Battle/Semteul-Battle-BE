@@ -7,7 +7,7 @@ import java.util.List;
 
 @Entity
 @Data
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(name = "Contestant", schema = "Semteul_Battle")
@@ -18,7 +18,8 @@ public class Contestant {
     @Column(updatable = false, unique = true, nullable = false)
     private Long id;
 
-    @Column(nullable = false)
+    // 공지사항 체크
+    @Column(nullable = true)
     private boolean isChecked;
 
     @Column(nullable = true)
@@ -41,5 +42,4 @@ public class Contestant {
     // 대회 기본키
     @OneToMany(mappedBy = "contestant")
     private List<ContestantContest> contestantContests;
-
 }

@@ -24,6 +24,4 @@ public class Examiner {
     @ManyToOne
     @JoinColumn(name = "contest_id", nullable = false)
     private Contest contest;
-
-
 }

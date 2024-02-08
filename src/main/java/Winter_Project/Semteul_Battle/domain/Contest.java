@@ -9,7 +9,7 @@ import java.util.List;
 
 @Entity
 @Data
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Contest {
@@ -64,9 +64,4 @@ public class Contest {
     public Contest(Long id) {
         this.id = id;
     }
-
-
-
-
-
 }
