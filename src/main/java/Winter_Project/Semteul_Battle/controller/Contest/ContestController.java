@@ -85,6 +85,4 @@ public class ContestController {
             return "contest delete failed";
         }
     }
-
-
 }

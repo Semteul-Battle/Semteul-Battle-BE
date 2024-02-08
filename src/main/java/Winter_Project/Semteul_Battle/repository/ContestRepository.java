@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.sql.Timestamp;
+import java.util.Optional;
 
 public interface ContestRepository extends JpaRepository<Contest, Long> {
     Page<Contest> findByStartTimeBeforeAndEndTimeAfter(Timestamp startTime, Timestamp endTime, Pageable pageable);
@@ -13,4 +14,5 @@ public interface ContestRepository extends JpaRepository<Contest, Long> {
     Page<Contest> findByStartTimeAfter(Timestamp startTime, Pageable pageable);
 
     Page<Contest> findByEndTimeBefore(Timestamp endTime, Pageable pageable);
+    Optional<Contest> findByContestName(String contestName);
 }

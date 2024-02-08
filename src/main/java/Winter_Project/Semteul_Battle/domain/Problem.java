@@ -55,6 +55,4 @@ public class Problem {
     @ManyToOne
     @JoinColumn(name = "contest_id", nullable = false)
     private Contest contest;
-
-
 }

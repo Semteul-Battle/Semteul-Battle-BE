@@ -5,10 +5,10 @@ import lombok.*;
 
 @Entity
 @Data
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ContestantContest { //
+public class ContestantContest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

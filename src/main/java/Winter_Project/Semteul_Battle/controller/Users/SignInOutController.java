@@ -13,9 +13,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -44,16 +46,6 @@ public class SignInOutController {
             JwtToken jwtToken = userService.signIn(loginId, password);
             log.info("사용자 '{}'의 로그인 성공", loginId);
             log.info("JWT 토큰 accessToken = {}, refreshToken = {}", jwtToken.getAccessToken(), jwtToken.getRefreshToken());
-            // 클라이언트 브라우저에 쿠키로 accessToken 저장
-            Cookie cookie = new Cookie("accessToken", jwtToken.getAccessToken());
-            cookie.setPath("/");
-            cookie.setHttpOnly(true);
-            // 이렇게 설정하면 HTTPS 프로토콜에서만 쿠키 전송
-            cookie.setSecure(true);
-            // 쿠키 만료 시간 설정 (예: 3시간)
-            cookie.setMaxAge(3600 * 3);
-            response.addCookie(cookie);
-            // refreshToken저장
             redisUtil.setDataExpire(loginId, jwtToken.getRefreshToken(), 86400000);
 
             return jwtToken;
@@ -68,7 +60,7 @@ public class SignInOutController {
     // loginId 주입 필요
     @PostMapping("/sign-out")
     public boolean signOut(@RequestBody SignOutDto signOutDto, @RequestHeader("Authorization") String token) {
-        if (token != null && token.startsWith("Bearer")) {
+        if (token != null && token.startsWith("Bearer ")) {
             String accessToken = token.substring(7); // "Bearer " 다음의 부분이 accessToken
 
             // redisDB에 저장된 리프레시 토큰을 삭제
@@ -84,4 +76,5 @@ public class SignInOutController {
         }
         return false;
     }
+
 }
