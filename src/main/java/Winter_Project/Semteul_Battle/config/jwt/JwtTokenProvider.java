@@ -25,6 +25,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class JwtTokenProvider {
+
+    @Value("${jwt.secret}")
+    private String secretKey;
     private final Key key;
 
     // application.yml에서 secret 값 가져와서 key에 저장
@@ -121,4 +124,23 @@ public class JwtTokenProvider {
             return e.getClaims();
         }
     }
+
+    public String extractLoginIdFromToken(String token) {
+        if (token == null || !token.startsWith("Bearer ")) {
+            return null;
+        }
+
+        String jwtToken = token.substring(7);
+
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(secretKey) // 시크릿 키 설정
+                .build()
+                .parseClaimsJws(jwtToken)
+                .getBody();
+
+        String loginId = claims.getSubject();
+
+        return loginId;
+    }
+
 }

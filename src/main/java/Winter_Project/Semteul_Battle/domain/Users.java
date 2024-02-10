@@ -82,7 +82,7 @@ public class Users implements UserDetails {
 
     @Override
     public String getUsername() {
-        return null;
+        return String.valueOf(this.id); // 기본키(id) 반환
     }
 
     @Override
@@ -104,4 +104,6 @@ public class Users implements UserDetails {
     public boolean isEnabled() {
         return false;
     }
+
+
 }

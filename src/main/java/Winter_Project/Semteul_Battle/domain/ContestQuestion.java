@@ -18,16 +18,19 @@ public class ContestQuestion {
     private Long id;
 
     @Column(nullable = false)
-    private String question;
+    private String question; // 질문 제목
 
     @Column(nullable = false)
-    private Timestamp questionTime;
+    private String content; // 질문 내용
+
+    @Column(nullable = false)
+    private Timestamp questionTime; // 질문 시간
 
     @Column(nullable = true)
-    private String answer;
+    private String answer; // 질문 대답
 
     @Column(nullable = true)
-    private Timestamp answerTime;
+    private Timestamp answerTime; // 질문 대답 시간
 
     // 유저(질문자) 아이디
     @ManyToOne
@@ -40,6 +43,8 @@ public class ContestQuestion {
     private Users answerer;
 
     // 대회 아이디
-
+    @ManyToOne
+    @JoinColumn(name = "contest_id")
+    private Contest contestId;
 
 }

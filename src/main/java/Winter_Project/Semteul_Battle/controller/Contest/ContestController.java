@@ -1,5 +1,6 @@
 package Winter_Project.Semteul_Battle.controller.Contest;
 
+import Winter_Project.Semteul_Battle.config.jwt.JwtTokenProvider;
 import Winter_Project.Semteul_Battle.domain.Contest;
 import Winter_Project.Semteul_Battle.domain.Examiner;
 import Winter_Project.Semteul_Battle.domain.Users;
@@ -26,6 +27,7 @@ public class ContestController {
     private final ContestService contestService;
     private final UserService userService;
     private final ExaminerRepository examinerRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
 
     // 대회 생성 - 출제자 지정
@@ -75,6 +77,8 @@ public class ContestController {
                                 @RequestHeader("Authorization") String token) {
 
         System.out.println("하이요" + contestId);
+        String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token);
+        System.out.println(tokenFromId);
 
         try {
             // 대회 및 연관된 정보 삭제
@@ -84,5 +88,7 @@ public class ContestController {
             log.error("Failed to delete contest", e);
             return "contest delete failed";
         }
+
+
     }
 }

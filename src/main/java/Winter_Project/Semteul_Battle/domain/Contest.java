@@ -61,6 +61,10 @@ public class Contest {
     @OneToMany(mappedBy = "contest")
     private List<Examiner> examiner;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "contestId")
+    private List<ContestQuestion> contestQuestions;
+
     public Contest(Long id) {
         this.id = id;
     }
