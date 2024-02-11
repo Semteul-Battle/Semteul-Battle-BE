@@ -18,25 +18,25 @@ public class Problem {
     @Column(updatable = false, unique = true, nullable = false) // 이게 문제의 고유 번호 ex) 12345번
     private Long id;
 
-    @Column(name = "number", nullable = false) // 문제 번호
+    @Column(name = "number", nullable = true) // 문제 번호
     private String number;
 
-    @Column(name = "title", nullable = false) // 문제 제목
+    @Column(name = "title", nullable = true) // 문제 제목
     private String title;
 
-    @Column(nullable = false) // 문제 내용
+    @Column(nullable = true) // 문제 내용
     private String content;
 
-    @Column(nullable = false) // 입력 내용
+    @Column(nullable = true) // 입력 내용
     private String input;
 
-    @Column(nullable = false) // 출력 설명
+    @Column(nullable = true) // 출력 설명
     private String output;
 
     @Lob // 문제 사진
     private byte[] pic;
 
-    @Column(nullable = false) // 제한 시간
+    @Column(nullable = true) // 제한 시간
     private String timeLimit;
 
 //    private // 코드
@@ -53,6 +53,6 @@ public class Problem {
 
     // 대회 기본키
     @ManyToOne
-    @JoinColumn(name = "contest_id", nullable = false)
+    @JoinColumn(name = "contest_id", nullable = true)
     private Contest contest;
 }
