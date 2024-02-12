@@ -15,4 +15,5 @@ public interface ContestRepository extends JpaRepository<Contest, Long> {
 
     Page<Contest> findByEndTimeBefore(Timestamp endTime, Pageable pageable);
     Optional<Contest> findByContestName(String contestName);
+    Optional<Contest> findById(Long contestId);
 }
