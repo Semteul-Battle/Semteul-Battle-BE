@@ -55,7 +55,7 @@ public class Contest {
 
     @JsonIgnore
     @OneToMany(mappedBy = "contest")
-    private List<contestNotice> contestNotices;
+    private List<ContestNotice> ContestNotices;
 
     @JsonIgnore
     @OneToMany(mappedBy = "contest")

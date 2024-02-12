@@ -64,7 +64,7 @@ public class Users implements UserDetails {
     private List<ContestQuestion> answerer;
 
     @OneToMany(mappedBy = "users")
-    private List<contestNotice> contestNotices;
+    private List<ContestNotice> ContestNotices;
 
     @OneToMany(mappedBy = "users")
     private List<Examiner> Examiners;

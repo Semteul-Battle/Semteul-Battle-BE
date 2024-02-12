@@ -1,6 +1,7 @@
 package Winter_Project.Semteul_Battle.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +12,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@Getter
+@Setter
 public class Problem {
 
     @Id
@@ -39,8 +42,6 @@ public class Problem {
     @Column(nullable = false) // 제한 시간
     private String timeLimit;
 
-//    private // 코드
-
     private int score; // 문제 배점
 
     // 외래키로 사용하는 경우
@@ -52,6 +53,7 @@ public class Problem {
     private List<IO> ios;
 
     // 대회 기본키
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "contest_id", nullable = false)
     private Contest contest;

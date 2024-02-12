@@ -125,6 +125,7 @@ public class JwtTokenProvider {
         }
     }
 
+    // 토큰에서 loginId 추출
     public String extractLoginIdFromToken(String token) {
         if (token == null || !token.startsWith("Bearer ")) {
             return null;
