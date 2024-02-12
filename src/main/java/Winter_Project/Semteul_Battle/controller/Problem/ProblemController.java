@@ -5,6 +5,7 @@ import Winter_Project.Semteul_Battle.dto.Problem.AddProblemDto;
 import Winter_Project.Semteul_Battle.dto.Problem.DeleteProblemDto;
 import Winter_Project.Semteul_Battle.repository.ContestRepository;
 import Winter_Project.Semteul_Battle.repository.ProblemRepository;
+import Winter_Project.Semteul_Battle.service.Contest.ContestLiveService;
 import Winter_Project.Semteul_Battle.service.Contest.ContestService;
 import Winter_Project.Semteul_Battle.service.Problem.AddProblemService;
 import Winter_Project.Semteul_Battle.service.Problem.DeleteProblemService;
@@ -18,18 +19,19 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/contests")
 public class ProblemController {
     private final AddProblemService addProblemService;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider  jwtTokenProvider;
     private final ContestService contestService;
     private final DeleteProblemService deleteProblemService;
     private final ProblemRepository problemRepository;
     private final ContestRepository contestRepository;
+    private final ContestLiveService contestLiveService;
 
     @PostMapping("/add")
     public boolean addProblem(@RequestBody AddProblemDto addProblemDto,
                               @RequestHeader("Authorization") String token) {
         Long contestId = addProblemDto.getContestId();
         String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // 토큰에서 id 추출
-        Long participantStatus = contestService.whoAreU(contestId, tokenFromId); // 참가자 / 출제자 구분
+        Long participantStatus = contestLiveService.whoAreU(contestId, tokenFromId); // 참가자 / 출제자 구분
 
         if (participantStatus == 0) { // 출제자가 맞는 경우
             addProblemService.problemFrame(addProblemDto);
@@ -44,7 +46,7 @@ public class ProblemController {
                                  @RequestHeader("Authorization") String token) {
         Long contestId = deleteProblemDto.getContestId();
         String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // 토큰에서 id 추출
-        Long participantStatus = contestService.whoAreU(contestId, tokenFromId); // 참가자 / 출제자 구분
+        Long participantStatus = contestLiveService.whoAreU(contestId, tokenFromId); // 참가자 / 출제자 구분
 
         // 출제자 여부 확인
         if (participantStatus == 0) {
