@@ -15,7 +15,6 @@ import java.util.List;
 @Getter
 @Setter
 public class Problem {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false, unique = true, nullable = false) // 이게 문제의 고유 번호 ex) 12345번

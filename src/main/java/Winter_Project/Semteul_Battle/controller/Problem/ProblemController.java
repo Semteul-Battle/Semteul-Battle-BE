@@ -3,12 +3,14 @@ package Winter_Project.Semteul_Battle.controller.Problem;
 import Winter_Project.Semteul_Battle.config.jwt.JwtTokenProvider;
 import Winter_Project.Semteul_Battle.dto.Problem.AddProblemDto;
 import Winter_Project.Semteul_Battle.dto.Problem.DeleteProblemDto;
+import Winter_Project.Semteul_Battle.dto.Problem.UpdateProblemDto;
 import Winter_Project.Semteul_Battle.repository.ContestRepository;
 import Winter_Project.Semteul_Battle.repository.ProblemRepository;
 import Winter_Project.Semteul_Battle.service.Contest.ContestLiveService;
 import Winter_Project.Semteul_Battle.service.Contest.ContestService;
 import Winter_Project.Semteul_Battle.service.Problem.AddProblemService;
 import Winter_Project.Semteul_Battle.service.Problem.DeleteProblemService;
+import Winter_Project.Semteul_Battle.service.Problem.UpdateProblemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -20,11 +22,11 @@ import org.springframework.web.bind.annotation.*;
 public class ProblemController {
     private final AddProblemService addProblemService;
     private final JwtTokenProvider  jwtTokenProvider;
-    private final ContestService contestService;
     private final DeleteProblemService deleteProblemService;
     private final ProblemRepository problemRepository;
     private final ContestRepository contestRepository;
     private final ContestLiveService contestLiveService;
+    private final UpdateProblemService updateProblemService;
 
     @PostMapping("/add")
     public boolean addProblem(@RequestBody AddProblemDto addProblemDto,
@@ -63,6 +65,31 @@ public class ProblemController {
                 return false;
             }
         } else { // 출제자가 아닌 경우
+            return false;
+        }
+    }
+
+    @PatchMapping("/update")
+    public boolean updateProblem(@RequestBody UpdateProblemDto updateProblemDto,
+                                 @RequestHeader("Authorization") String token) {
+        Long contestId = updateProblemDto.getContestId();
+        String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // 토큰에서 id 추출
+        Long participantStatus = contestLiveService.whoAreU(contestId, tokenFromId); // 참가자 / 출제자 구분
+
+        // 출제자 여부 확인
+        if (participantStatus == 0) {
+            // 해당 대회와 문제가 존재하는지 확인
+            boolean contestExists = contestRepository.existsById(contestId);
+            boolean problemExists = problemRepository.existsById(updateProblemDto.getProblemId());
+
+            // 대회, 문제 여부 확인 후 문제 내용 저장
+            if (contestExists && problemExists) {
+            updateProblemService.updateProblem(updateProblemDto);
+                return true;
+            } else {
+                return false;
+            }
+        } else {
             return false;
         }
     }
