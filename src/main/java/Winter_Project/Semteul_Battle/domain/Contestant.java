@@ -22,18 +22,6 @@ public class Contestant {
     @Column(nullable = true)
     private boolean isChecked;
 
-    @Column(nullable = true)
-    private Long originalScore;
-
-    @Column(nullable = true)
-    private Long origianlPenalty;
-
-    @Column(nullable = true)
-    private Long freezeScore;
-
-    @Column(nullable = true)
-    private Long freezePenalty;
-
     // 유저 기본키
     @ManyToOne
     @JoinColumn(name = "users_id", nullable = false)

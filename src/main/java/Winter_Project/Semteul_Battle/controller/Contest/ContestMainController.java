@@ -1,14 +1,9 @@
 package Winter_Project.Semteul_Battle.controller.Contest;
 
 import Winter_Project.Semteul_Battle.config.jwt.JwtTokenProvider;
-import Winter_Project.Semteul_Battle.domain.ContestNotice;
-import Winter_Project.Semteul_Battle.domain.Problem;
-import Winter_Project.Semteul_Battle.domain.Users;
-import Winter_Project.Semteul_Battle.dto.Contest.ContestInfoDTO;
-import Winter_Project.Semteul_Battle.dto.Contest.ContestNoticeDTO;
-import Winter_Project.Semteul_Battle.repository.ContestNoticeRepository;
-import Winter_Project.Semteul_Battle.repository.ProblemRepository;
-import Winter_Project.Semteul_Battle.repository.UserRepository;
+import Winter_Project.Semteul_Battle.domain.*;
+import Winter_Project.Semteul_Battle.dto.Contest.*;
+import Winter_Project.Semteul_Battle.repository.*;
 import Winter_Project.Semteul_Battle.service.Contest.ContestLiveService;
 import Winter_Project.Semteul_Battle.service.Contest.ContestService;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +29,8 @@ public class ContestMainController {
     private final ProblemRepository problemRepository;
     private final ContestNoticeRepository contestNoticeRepository;
     private final UserRepository userRepository;
+    private final ContestQuestionRepository contestQuestionRepository;
+    private final ContestRepository contestRepository;
 
     // 실시간 대회 - 참가자 권한
     @GetMapping("/contestMain")
@@ -56,6 +53,14 @@ public class ContestMainController {
     public List<ContestInfoDTO> getProblemsByContestId(@RequestParam Long contestId,
                                                        @RequestHeader("Authorization") String token) {
         return contestLiveService.getProblemsByContestId(contestId);
+    }
+
+    // 실시간 대회 - 문제 객체 넘기기
+    @GetMapping("/problemInfo")
+    public ResponseEntity<List<Problem>> getProblemsInfo(@RequestParam Long contestId,
+                                                         @RequestHeader("Authorization") String token) {
+        List<Problem> problems = contestLiveService.getProblemsInfo(contestId);
+        return ResponseEntity.ok(problems);
     }
 
     // 실시간 대회 - 공지사항 불러오기
@@ -115,11 +120,77 @@ public class ContestMainController {
                 .getId();
 
         boolean isContestantChecked = contestLiveService.isCheckedReturn(contestId, userId);
-
-        System.out.println("출력 값" + isContestantChecked);
-
         return ResponseEntity.ok(isContestantChecked);
     }
 
+    // 실시간 대회 - 제출 현황
+    @GetMapping("/submitList")
+    public ResponseEntity<List<SubmitDTO>> getSubmitsList(@RequestParam Long contestId,
+                                                          @RequestHeader("Authorization") String token) {
+
+        List<SubmitDTO> submitDTOs = contestLiveService.getSubmitsWithProblems(contestId);
+        return ResponseEntity.ok(submitDTOs);
+    }
+
+    // 질문 게시판 불러오기
+    @GetMapping("/questionsList/{contestId}")
+    public List<ContestQuestion> getQuestionsByContestId(@PathVariable Long contestId) {
+
+        Contest contest = contestService.getContestById(contestId);
+        return contestLiveService.getQuestionsByContest(contest);
+    }
+
+    // 질문 게시판에 글쓰기
+    @PostMapping("/createQuestions")
+    public ResponseEntity<String> addQuestion(@RequestBody ContestQuestionDTO contestQuestionDTO,
+                                              @RequestHeader("Authorization") String token) {
+
+        String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // 토큰에서 loginId 추출
+        Optional<Users> userOptional = userRepository.findByLoginId(tokenFromId);
+
+        if (userOptional.isPresent()) {
+            Users user = userOptional.get();
+            Long userId = user.getId();
+
+            // 질문자 ID 설정
+            contestQuestionDTO.setUserId(userId);
+
+            contestLiveService.addQuestion(contestQuestionDTO);
+
+            return new ResponseEntity<>("Question added successfully", HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    // 질문 게시판에서 글 삭제하기
+    @DeleteMapping("/deleteQuestion/{questionId}")
+    public ResponseEntity<String> deleteContestQuestion(@PathVariable Long questionId,
+                                                        @RequestHeader("Authorization") String token) {
+
+        contestLiveService.deleteContestQuestion(questionId);
+        return new ResponseEntity<>("Question delete successfully", HttpStatus.CREATED);
+    }
+
+    @PostMapping("/QuestionAnswer")
+    public ResponseEntity<String> answerQuestion(
+            @RequestBody AnswerDTO answerDTO,
+            @RequestHeader("Authorization") String token) {
+
+        String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // 토큰에서 loginId 추출
+        Optional<Users> userOptional = userRepository.findByLoginId(tokenFromId);
+
+        if (userOptional.isPresent()) {
+            Users answerer = userOptional.get();
+            Long userId = answerer.getId();
+
+            // 답변자의 ID 설정
+            answerDTO.setAnswerer(userId);
+
+            return contestLiveService.answerQuestion(answerDTO);
+        } else {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+    }
 
 }

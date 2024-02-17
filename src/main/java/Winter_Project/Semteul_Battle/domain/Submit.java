@@ -10,18 +10,13 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Builder
 @Entity
+@Data
 public class Submit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false, unique = true, nullable = false)
     private Long id;
-
-//    @Column(name = "user_id", nullable= false) // 유저 테이블의 기본키
-//    private String userId;
-//
-//    @Column(name = "problem_id", nullable = false) // 문제 테이블의 기본키
-//    private String problemId;
 
     @Column(nullable= false) // 언어
     private String language;
@@ -53,5 +48,9 @@ public class Submit {
     @JoinColumn(name = "problem_id", nullable = false)
     private Problem problem;
 
+    // 대회 기본키
+    @ManyToOne
+    @JoinColumn(name = "contest_id", nullable = false)
+    private Contest contest;
 
 }

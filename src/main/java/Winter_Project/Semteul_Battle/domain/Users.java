@@ -1,5 +1,6 @@
 package Winter_Project.Semteul_Battle.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -57,9 +58,11 @@ public class Users implements UserDetails {
     @OneToMany(mappedBy = "users")
     private List<Contestant> contestants;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "questioner")
     private List<ContestQuestion> questioner;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "answerer")
     private List<ContestQuestion> answerer;
 

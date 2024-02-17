@@ -1,15 +1,17 @@
 package Winter_Project.Semteul_Battle.service.Contest;
 
 import Winter_Project.Semteul_Battle.domain.*;
-import Winter_Project.Semteul_Battle.dto.Contest.ContestInfoDTO;
-import Winter_Project.Semteul_Battle.dto.Contest.ContestNoticeDTO;
+import Winter_Project.Semteul_Battle.dto.Contest.*;
 import Winter_Project.Semteul_Battle.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,6 +29,8 @@ public class ContestLiveService {
     private final ContestantContestRepository contestantContestRepository;
     private final UserRepository userRepository;
     private final ContestantRepository contestantRepository;
+    private final SubmitRepository submitRepository;
+    private final ContestQuestionRepository contestQuestionRepository;
 
     // 토큰에서 추출한 아이디로 일반 유저인지 출제자인지 판단
     public Long whoAreU(Long contestId, String loginId) {
@@ -82,8 +86,13 @@ public class ContestLiveService {
                 .collect(Collectors.toList());
     }
 
+    // 문제 정보 넘기기
+    public List<Problem> getProblemsInfo(Long contestId) {
+        return problemRepository.findByContest_Id(contestId);
+    }
+
     // 대회 공지사항
-    @Transactional(readOnly=false)
+    @Transactional(readOnly = false)
     public List<ContestNotice> getContestNoticeByContestId(Long contestId) {
 
         // 공지사항 불러올때는 다 false
@@ -93,7 +102,7 @@ public class ContestLiveService {
     }
 
     // 대회 공지사항 - 글쓰기
-    @Transactional(readOnly=false)
+    @Transactional(readOnly = false)
     public ContestNotice saveContestNotice(ContestNoticeDTO contestNoticeDTO) {
         ContestNotice contestNotice = new ContestNotice();
 
@@ -110,13 +119,13 @@ public class ContestLiveService {
         contestNotice.setUsers(user);
 
         // 새로운 글이 써지면 true
-        updateContestantsCheckedStatusByContestId(contestNoticeDTO.getContestId(),true);
+        updateContestantsCheckedStatusByContestId(contestNoticeDTO.getContestId(), true);
 
         return contestNoticeRepository.save(contestNotice);
     }
 
     // 대회 공지사항 - 삭제
-    @Transactional(readOnly=false)
+    @Transactional(readOnly = false)
     public void deleteContestNotice(Long contestNoticeId) {
         // 대회 공지사항을 찾습니다.
         ContestNotice contestNotice = contestNoticeRepository.findById(contestNoticeId)
@@ -133,7 +142,7 @@ public class ContestLiveService {
     }
 
     // 대회 공지사항 - 체크 변환
-    @Transactional(readOnly=false)
+    @Transactional(readOnly = false)
     public void updateContestantsCheckedStatusByContestId(Long contestId, boolean isChecked) {
 
         System.out.println("받은 값" + isChecked);
@@ -165,4 +174,98 @@ public class ContestLiveService {
         Optional<Contestant> contestantOptional = contestantRepository.findByIdInAndUsers_Id(contestantIds, userId);
         return contestantOptional.map(Contestant::isChecked).orElse(false);
     }
+
+    // 대회 제출현황
+    public List<SubmitDTO> getSubmitsWithProblems(Long contestId) {
+        List<Submit> submits = submitRepository.findByContest_Id(contestId);
+        return submits.stream()
+                .map(submit -> {
+                    SubmitDTO submitDTO = new SubmitDTO();
+                    // Submit 정보 설정
+                    submitDTO.setId(submit.getId());
+                    submitDTO.setLanguage(submit.getLanguage());
+                    submitDTO.setRuntime(submit.getRuntime());
+                    submitDTO.setTime(submit.getTime());
+                    submitDTO.setResult(submit.getResult());
+                    submitDTO.setLoginId(submit.getUsers().getLoginId());
+                    // ProblemDTO 설정
+                    ProblemDTO problemDTO = new ProblemDTO();
+                    problemDTO.setId(submit.getProblem().getId());
+                    problemDTO.setNumber(submit.getProblem().getNumber());
+                    // 다른 필요한 정보들도 추가할 수 있습니다.
+
+                    submitDTO.setProblem(problemDTO);
+                    return submitDTO;
+                })
+                .collect(Collectors.toList());
+    }
+
+    // 대회 질문 게시판
+    @Transactional(readOnly = false)
+    public List<ContestQuestion> getQuestionsByContest(Contest contest) {
+        return contestQuestionRepository.findByContestId(contest);
+    }
+
+    // 질문 게시판 글쓰기
+    @Transactional(readOnly = false)
+    public void addQuestion(ContestQuestionDTO contestQuestionDTO) {
+        ContestQuestion contestQuestion = new ContestQuestion();
+        contestQuestion.setQuestion(contestQuestionDTO.getQuestion());
+        contestQuestion.setContent(contestQuestionDTO.getContent());
+        contestQuestion.setQuestionTime(contestQuestionDTO.getQuestionTime());
+
+        // 질문자 ID 설정
+        Long questionerId = contestQuestionDTO.getUserId();
+        Optional<Users> questionerOptional = userRepository.findById(questionerId);
+        questionerOptional.ifPresent(contestQuestion::setQuestioner);
+
+        // 대회 정보 설정
+        Long contestId = contestQuestionDTO.getContestId();
+        Optional<Contest> contestOptional = contestRepository.findById(contestId);
+        contestOptional.ifPresent(contestQuestion::setContestId);
+
+        contestQuestionRepository.save(contestQuestion);
+    }
+
+
+    // 질문 글 삭제
+    @Transactional
+    public void deleteContestQuestion(Long questionId) {
+        contestQuestionRepository.deleteById(questionId);
+    }
+
+    @Transactional
+    public ResponseEntity<String> answerQuestion(AnswerDTO answerDTO) {
+        // 답변에 필요한 정보를 추출합니다.
+        Long questionId = answerDTO.getQuestionId();
+        String answerContent = answerDTO.getAnswer();
+        Timestamp answerTime = answerDTO.getAnswerTime();
+        Long answererId = answerDTO.getAnswerer();
+
+        // 질문 조회
+        Optional<ContestQuestion> questionOptional = contestQuestionRepository.findById(questionId);
+        if (questionOptional.isPresent()) {
+            ContestQuestion contestQuestion = questionOptional.get();
+
+            // 답변자 정보 설정
+            Optional<Users> answererOptional = userRepository.findById(answererId);
+            if (answererOptional.isPresent()) {
+                Users answerer = answererOptional.get();
+                contestQuestion.setAnswerer(answerer);
+                contestQuestion.setAnswer(answerContent);
+                contestQuestion.setAnswerTime(answerTime);
+
+                contestQuestionRepository.save(contestQuestion);
+                return new ResponseEntity<>("Answer added successfully", HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity<>("Answerer not found", HttpStatus.NOT_FOUND);
+            }
+        } else {
+            return new ResponseEntity<>("Question not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+
+
 }

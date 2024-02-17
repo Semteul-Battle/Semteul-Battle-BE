@@ -80,6 +80,10 @@ public class ContestService {
 //        return contestInfoDTO;
 //    }
 
+    @Transactional(readOnly = false)
+    public Contest getContestById(Long contestId) {
+        return contestRepository.findById(contestId).orElse(null);
+    }
 
 
 

@@ -1,5 +1,6 @@
 package Winter_Project.Semteul_Battle.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -7,7 +8,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Data
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ContestQuestion {
@@ -33,18 +34,25 @@ public class ContestQuestion {
     private Timestamp answerTime; // 질문 대답 시간
 
     // 유저(질문자) 아이디
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "questioner_id")
     private Users questioner;
 
     // 유저(답변자) 아이디
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "answerer_id")
+    @JoinColumn(name = "answerer_id", nullable = true)
     private Users answerer;
 
     // 대회 아이디
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "contest_id")
     private Contest contestId;
+
+    public Users getAnswerer() {
+        return this.answerer != null ? this.answerer : new Users(); // 또는 null을 대신할 다른 사용자를 리턴
+    }
 
 }
