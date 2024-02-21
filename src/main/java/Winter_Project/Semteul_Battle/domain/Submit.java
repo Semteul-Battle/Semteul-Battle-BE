@@ -16,7 +16,7 @@ public class Submit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false, unique = true, nullable = false)
-    private Long id;
+    private Long id; // 고유 번호
 
     @Column(nullable= false) // 언어
     private String language;
@@ -33,7 +33,7 @@ public class Submit {
     @Column(nullable= false) // 제출 시간
     private Timestamp time;
 
-    @Column(nullable= false) // 결과
+    @Column(nullable =true) // 결과
     private Long result;
 
     // 외래키로 사용하는 경우

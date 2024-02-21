@@ -12,12 +12,18 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Builder
 public class SubmitDTO {
-    private Long id;
-    private String language;
-    private Long runtime;
-    private String loginId;
-    private Timestamp time;
-    private Long result;
-    private ProblemDTO problem;
+
+    private Long id; //  문제 아이디(제출번호)
+    private ProblemDTO problem; // 문제 아이디
+
+    private String language; // 언어
+    private Long runtime; // 실행 제한 시간
+    private Long memoLimit; // 메모리 제한
+    private Long userId; // 사용자 아이디
+    private Timestamp time; // 제출 시간
+    private Long result; // 결과
+    private String code; // 코드
+
+    private Long contestId; // 대회 번호
 
 }

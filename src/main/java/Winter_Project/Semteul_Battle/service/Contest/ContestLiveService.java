@@ -187,7 +187,7 @@ public class ContestLiveService {
                     submitDTO.setRuntime(submit.getRuntime());
                     submitDTO.setTime(submit.getTime());
                     submitDTO.setResult(submit.getResult());
-                    submitDTO.setLoginId(submit.getUsers().getLoginId());
+                    submitDTO.setUserId(submit.getUsers().getId());
                     // ProblemDTO 설정
                     ProblemDTO problemDTO = new ProblemDTO();
                     problemDTO.setId(submit.getProblem().getId());
