@@ -8,6 +8,9 @@ import Winter_Project.Semteul_Battle.repository.ProblemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 @Service
 @RequiredArgsConstructor
 public class AddProblemService {
@@ -34,5 +37,22 @@ public class AddProblemService {
 
         // Problem 엔티티 저장
         problemRepository.save(problem);
+    }
+
+    // 입력 및 출력 파일 생성 메서드
+    public void createInputOutputFiles(String inputContent, String outputContent) {
+        String basePath = "C:\\Users\\82104\\Desktop\\project"; // 기본 경로 설정
+        String inputFileName = basePath + "\\input.txt"; // 입력 파일 이름 설정
+        String outputFileName = basePath + "\\output.txt"; // 출력 파일 이름 설정
+
+        try {
+            // 입력 파일 생성
+            Files.write(Paths.get(inputFileName), inputContent.getBytes());
+            // 출력 파일 생성
+            Files.write(Paths.get(outputFileName), outputContent.getBytes());
+        } catch (Exception e) {
+            e.printStackTrace();
+            // 파일 생성 실패 처리
+        }
     }
 }

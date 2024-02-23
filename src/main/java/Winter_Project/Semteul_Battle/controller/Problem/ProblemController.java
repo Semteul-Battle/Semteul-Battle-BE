@@ -9,6 +9,8 @@ import Winter_Project.Semteul_Battle.service.Contest.ContestLiveService;
 import Winter_Project.Semteul_Battle.service.Problem.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -59,7 +61,7 @@ public class ProblemController {
         }
     }
 
-
+    // 문제 삭제
     @DeleteMapping("/deleteProblem")
     public boolean deleteProblem(@RequestBody DeleteProblemDto deleteProblemDto,
                                  @RequestHeader("Authorization") String token) {
@@ -87,6 +89,7 @@ public class ProblemController {
         }
     }
 
+    // 문제 수정
     @PatchMapping("/updateProblem")
     public boolean updateProblem(@RequestBody UpdateProblemDto updateProblemDto,
                                  @RequestHeader("Authorization") String token) {
@@ -110,6 +113,23 @@ public class ProblemController {
             }
         } else {
             return false;
+        }
+    }
+
+    // 파일 생성 API 수정
+    @PostMapping("/addFile")
+    public ResponseEntity<String> generateFiles(@RequestBody AddIOFileDto addIOFileDto,
+                                                @RequestHeader("Authorization") String token) {
+        Long contestId = addIOFileDto.getContestId();
+        String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // 토큰에서 id 추출
+        Long participantStatus = contestLiveService.whoAreU(contestId, tokenFromId); // 참가자 / 출제자 구분
+
+        if (participantStatus == 0) { // 출제자가 맞는 경우
+            // 입력 및 출력 파일 생성
+            addProblemService.createInputOutputFiles(addIOFileDto.getInputFile(), addIOFileDto.getOutputFile());
+            return ResponseEntity.ok("Files generated successfully."); // 파일 생성 완료 메시지 반환
+        } else { // 출제자가 아닌 경우
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to perform this action."); // 권한 없음 에러 반환
         }
     }
 }
