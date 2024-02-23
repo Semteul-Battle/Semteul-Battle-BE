@@ -11,7 +11,6 @@ import java.util.List;
 @Repository
 public interface ContestantContestRepository extends JpaRepository<ContestantContest,Long> {
     List<ContestantContest> findContestantContestByContest_Id(Long contestId);
-
     List<ContestantContest> findByContestId(Long contestId);
-
+    List<ContestantContest> findByContestant_Id(Long contestantId);
 }

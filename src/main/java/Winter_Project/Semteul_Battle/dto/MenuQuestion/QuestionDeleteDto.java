@@ -1,4 +1,4 @@
-package Winter_Project.Semteul_Battle.dto.Problem;
+package Winter_Project.Semteul_Battle.dto.MenuQuestion;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,8 +9,6 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeleteProblemDto {
-    private Long problemId;
-    private Long contestId;
-    private Long ioId;
+public class QuestionDeleteDto {
+    private Long questionId;
 }

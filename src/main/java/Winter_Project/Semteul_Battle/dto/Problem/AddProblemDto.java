@@ -18,7 +18,5 @@ public class AddProblemDto {
     private String timeLimit;
     private int score = 0;
     private byte[] pic;
-    private String inputExample;
-    private String outputExample;
     private Long contestId;
 }

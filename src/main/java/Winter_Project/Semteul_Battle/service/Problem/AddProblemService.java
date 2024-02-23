@@ -17,7 +17,7 @@ public class AddProblemService {
     public void problemFrame(AddProblemDto addProblemDto) {
         // Contest ID를 사용하여 Contest 객체 찾기
         Contest contest = contestRepository.findById(addProblemDto.getContestId())
-                .orElseThrow(() -> new RuntimeException("Contest not found"));
+                .orElseThrow(() -> new RuntimeException("해당 대회를 찾을 수 없습니다."));
 
         // AddProblemDto를 Problem 엔티티로 변환하고 Contest 객체 설정
         Problem problem = Problem.builder()

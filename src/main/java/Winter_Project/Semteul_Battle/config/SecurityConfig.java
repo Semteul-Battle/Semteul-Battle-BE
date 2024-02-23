@@ -29,6 +29,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 // 해당 API에 대해서는 모든 요청을 허가
+                .requestMatchers("/menu/**").permitAll()
                 .requestMatchers("/users/**").permitAll()
                 .requestMatchers("/contests/**").permitAll()
                 .requestMatchers("/submit/**").permitAll()

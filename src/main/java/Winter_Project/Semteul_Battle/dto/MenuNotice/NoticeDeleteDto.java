@@ -1,16 +1,16 @@
-package Winter_Project.Semteul_Battle.dto.Problem;
+package Winter_Project.Semteul_Battle.dto.MenuNotice;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.sql.Timestamp;
+
 @Data
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeleteProblemDto {
-    private Long problemId;
-    private Long contestId;
-    private Long ioId;
+public class NoticeDeleteDto {
+    private Long noticeId;
 }

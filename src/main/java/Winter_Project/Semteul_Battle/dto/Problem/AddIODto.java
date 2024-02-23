@@ -9,8 +9,9 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeleteProblemDto {
+public class AddIODto {
     private Long problemId;
     private Long contestId;
-    private Long ioId;
+    private String input;
+    private String output;
 }
