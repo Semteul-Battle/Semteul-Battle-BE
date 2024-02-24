@@ -21,7 +21,6 @@ public class SubmitController {
     private final ContestLiveService contestLiveService;
     private final JwtTokenProvider jwtTokenProvider;
 
-
     @PostMapping("/saveSubmit")
     public ResponseEntity<String> submitCode(@RequestBody SubmitDTO submitDTO,
                                              @RequestHeader("Authorization") String token) {

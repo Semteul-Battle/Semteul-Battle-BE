@@ -93,10 +93,14 @@ public class ContestLiveService {
 
     // 대회 공지사항
     @Transactional(readOnly = false)
-    public List<ContestNotice> getContestNoticeByContestId(Long contestId) {
+    public List<ContestNotice> getContestNoticeByContestId(Long contestId, String tokenFromId) {
 
-        // 공지사항 불러올때는 다 false
-        updateContestantsCheckedStatusByContestId(contestId, false);
+        Long userId = userRepository.findByLoginId(tokenFromId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with loginId: " + tokenFromId))
+                .getId();
+
+        // 공지사항 불러올때는 해당 id만 false로.
+        changeCheckIdByHeIs(userId);
 
         return contestNoticeRepository.findByContest_Id(contestId);
     }
@@ -141,11 +145,9 @@ public class ContestLiveService {
         updateContestantsCheckedStatusByContestId(contestId, false);
     }
 
-    // 대회 공지사항 - 체크 변환
+    // 대회 공지사항 - 전체 체크 변환
     @Transactional(readOnly = false)
     public void updateContestantsCheckedStatusByContestId(Long contestId, boolean isChecked) {
-
-        System.out.println("받은 값" + isChecked);
 
         // 주어진 contestId에 해당하는 모든 참가자를 찾음
         List<ContestantContest> contestantContests = contestantContestRepository.findByContestId(contestId);
@@ -163,9 +165,21 @@ public class ContestLiveService {
             contestantRepository.save(contestant); // 변경사항을 저장
         }
     }
-
+    @Transactional(readOnly = false)
+    public void changeCheckIdByHeIs(Long userId) {
+        Optional<Contestant> optionalContestant = contestantRepository.findByUsersId(userId);
+        if (optionalContestant.isPresent()) {
+            Contestant contestant = optionalContestant.get();
+            contestant.setChecked(false); // isChecked 값을 false로 설정
+            contestantRepository.save(contestant); // 변경된 엔티티 저장
+        } else {
+            // 해당 ID로 찾은 Contestant가 없는 경우 처리할 내용
+            throw new IllegalArgumentException("Contestant with id " + userId + " not found");
+        }
+    }
 
     // 대회 공지사항 - isChecked 값 반환
+    @Transactional(readOnly = false)
     public boolean isCheckedReturn(Long contestId, Long userId) {
         List<ContestantContest> contestantContests = contestantContestRepository.findContestantContestByContest_Id(contestId);
         List<Long> contestantIds = contestantContests.stream()

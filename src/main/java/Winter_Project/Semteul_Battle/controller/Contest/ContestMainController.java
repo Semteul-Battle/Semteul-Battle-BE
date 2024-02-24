@@ -68,7 +68,9 @@ public class ContestMainController {
     public List<ContestNotice> getContestNoticeByContestId(@RequestParam Long contestId,
                                                            @RequestHeader("Authorization") String token) {
 
-        List<ContestNotice> notices = contestLiveService.getContestNoticeByContestId(contestId);
+        String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // 토큰에서 loginId 추출
+
+        List<ContestNotice> notices = contestLiveService.getContestNoticeByContestId(contestId, tokenFromId);
 
         return notices != null ? notices : Collections.emptyList();
     }
@@ -111,10 +113,8 @@ public class ContestMainController {
     @GetMapping("/isChecked")
     public ResponseEntity<Boolean> isChecked(@RequestParam("contestId") Long contestId,
                                              @RequestHeader("Authorization") String token) {
-        System.out.println("들어옴요");
 
         String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // 토큰에서 loginId 추출
-
         Long userId = userRepository.findByLoginId(tokenFromId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with loginId: " + tokenFromId))
                 .getId();
@@ -172,6 +172,7 @@ public class ContestMainController {
         return new ResponseEntity<>("Question delete successfully", HttpStatus.CREATED);
     }
 
+    // 질문 게시판 댓글 달기
     @PostMapping("/QuestionAnswer")
     public ResponseEntity<String> answerQuestion(
             @RequestBody AnswerDTO answerDTO,

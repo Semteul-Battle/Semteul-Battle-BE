@@ -45,6 +45,7 @@ public class Problem {
 
     // 외래키로 사용하는 경우
 
+    @JsonIgnore
     @OneToMany(mappedBy = "problem") // - 제출 테이블에서 참조해감
     private List<Submit> submits;
 

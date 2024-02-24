@@ -177,7 +177,6 @@ public class SubmitService {
                 // 엔터티를 찾을 수 없는 경우 처리
                 System.out.println("해당 submit을 찾을 수 없습니다. submitId: " + submitId);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
