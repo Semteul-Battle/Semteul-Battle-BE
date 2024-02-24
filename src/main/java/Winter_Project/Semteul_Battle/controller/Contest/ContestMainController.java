@@ -8,6 +8,8 @@ import Winter_Project.Semteul_Battle.service.Contest.ContestLiveService;
 import Winter_Project.Semteul_Battle.service.Contest.ContestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -125,12 +127,15 @@ public class ContestMainController {
 
     // 실시간 대회 - 제출 현황
     @GetMapping("/submitList")
-    public ResponseEntity<List<SubmitDTO>> getSubmitsList(@RequestParam Long contestId,
-                                                          @RequestHeader("Authorization") String token) {
-
-        List<SubmitDTO> submitDTOs = contestLiveService.getSubmitsWithProblems(contestId);
-        return ResponseEntity.ok(submitDTOs);
+    public ResponseEntity<SubmitPageDto<SubmitDTO>> getSubmitsList(@RequestParam Long contestId,
+                                                                   @RequestParam(defaultValue = "0") int page,
+                                                                   @RequestParam(defaultValue = "10") int size,
+                                                                   @RequestHeader("Authorization") String token) {
+        Pageable pageable = PageRequest.of(page, size);
+        SubmitPageDto<SubmitDTO> submitPageDto = contestLiveService.getSubmitsWithProblems(contestId, pageable);
+        return ResponseEntity.ok(submitPageDto);
     }
+
 
     // 질문 게시판 불러오기
     @GetMapping("/questionsList/{contestId}")

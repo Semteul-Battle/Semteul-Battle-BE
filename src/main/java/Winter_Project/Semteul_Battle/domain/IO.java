@@ -15,17 +15,11 @@ public class IO {
     @Column(updatable = false, unique = true, nullable = false) // 이게 문제의 고유 번호 ex) 12345번
     private Long id;
 
-    @Column(nullable = false) // 입력 예시
+    @Column(nullable = true) // 입력 예시
     private String input;
 
-    @Column(nullable = false) // 출력 예시
+    @Column(nullable = true) // 출력 예시
     private String output;
-
-    @Column(nullable = false) // 채점 파일 input
-    private byte[] solutionInput;
-
-    @Column(nullable = false) // 채점 파일 output
-    private byte[] solutionOutput;
 
     // 문제 기본키
     @ManyToOne

@@ -14,9 +14,12 @@ public class UpdateProblemDto {
     private String content;
     private String input;
     private String output;
+    private String inputIO;
+    private String outputIO;
     private String timeLimit;
     private int score = 0;
     private byte[] pic;
     private Long contestId;
     private Long problemId;
+    private Long ioId;
 }

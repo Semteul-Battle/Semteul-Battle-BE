@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,8 +18,9 @@ public class ContestApplicationController {
     private final ContestApplicationService contestApplicationService;
 
     @PostMapping("/apply")
-    public ResponseEntity<String> applyContest(@RequestBody ContestApplicationDto contestApplicationDto) {
-        boolean result = contestApplicationService.applyContest(contestApplicationDto);
+    public ResponseEntity<String> applyContest(@RequestBody ContestApplicationDto contestApplicationDto,
+                                               @RequestHeader("Authorization") String token) {
+        boolean result = contestApplicationService.applyContest(contestApplicationDto, token);
         if (result) {
             return ResponseEntity.ok("대회 신청이 완료되었습니다.");
         } else {

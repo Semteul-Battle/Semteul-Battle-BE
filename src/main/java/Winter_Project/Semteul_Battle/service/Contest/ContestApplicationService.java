@@ -28,19 +28,10 @@ public class ContestApplicationService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
 
-    public boolean applyContest(ContestApplicationDto contestApplicationDto) {
-        String accessToken = contestApplicationDto.getAccessToken();
+    public boolean applyContest(ContestApplicationDto contestApplicationDto, String token) {
 
-        // 로그인 사용자 확인
-        if (!jwtTokenProvider.validateToken(accessToken)) {
-            log.error("유효하지 않은 토큰입니다.");
-            return false;
-        }
-
-        // 사용자 정보 추출
-        Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
         // Contestant 객체 생성하여 사용자 정보 설정
-        String loginId = authentication.getName();
+        String loginId = jwtTokenProvider.extractLoginIdFromToken(token);
         Optional<Users> optionalUser = userRepository.findByLoginId(loginId);
         // Contestant 엔티티 생성
         Contestant contestant = new Contestant();

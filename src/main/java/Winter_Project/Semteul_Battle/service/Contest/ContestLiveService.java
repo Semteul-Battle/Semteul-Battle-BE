@@ -5,6 +5,8 @@ import Winter_Project.Semteul_Battle.dto.Contest.*;
 import Winter_Project.Semteul_Battle.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -190,9 +192,10 @@ public class ContestLiveService {
     }
 
     // 대회 제출현황
-    public List<SubmitDTO> getSubmitsWithProblems(Long contestId) {
-        List<Submit> submits = submitRepository.findByContest_Id(contestId);
-        return submits.stream()
+    public SubmitPageDto<SubmitDTO> getSubmitsWithProblems(Long contestId, Pageable pageable) {
+        Page<Submit> submitsPage = submitRepository.findByContestId(contestId, pageable);
+
+        List<SubmitDTO> submitDTOs = submitsPage.getContent().stream()
                 .map(submit -> {
                     SubmitDTO submitDTO = new SubmitDTO();
                     // Submit 정보 설정
@@ -212,6 +215,20 @@ public class ContestLiveService {
                     return submitDTO;
                 })
                 .collect(Collectors.toList());
+
+        // 이전 페이지와 다음 페이지의 여부 확인
+        boolean hasPreviousPage = submitsPage.hasPrevious();
+        boolean hasNextPage = submitsPage.hasNext();
+
+        return new SubmitPageDto<>(
+                submitDTOs,
+                submitsPage.getNumber(),
+                submitsPage.getSize(),
+                submitsPage.getTotalElements(),
+                submitsPage.getTotalPages(),
+                hasPreviousPage,
+                hasNextPage
+        );
     }
 
     // 대회 질문 게시판
