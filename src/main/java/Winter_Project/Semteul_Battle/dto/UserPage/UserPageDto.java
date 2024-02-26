@@ -7,13 +7,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.Base64;
 import java.util.List;
 
 @Data
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserPageDto {
-    private Users usersEntity;
-    private List<Contest> contestList;
+    private String userName;
+    private String loginId;
+    private String university;
+    private String major;
+    private List<ContestInfoDto> contestList;
 }
