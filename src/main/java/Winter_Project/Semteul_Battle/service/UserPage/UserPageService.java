@@ -29,8 +29,6 @@ public class UserPageService {
     private final ContestantContestRepository contestantContestRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
-    // UserPageService.java
-
     @Transactional(readOnly = true)
     public UserPageDto getUserInfoWithContests(String token) {
         String loginId = jwtTokenProvider.extractLoginIdFromToken(token);
@@ -73,7 +71,7 @@ public class UserPageService {
         return userPageDto;
     }
 
-
+    // 대회전적 숨김 기능
     @Transactional
     public void setShowContestsVisibility(String token, boolean visible) {
         String loginId = jwtTokenProvider.extractLoginIdFromToken(token);

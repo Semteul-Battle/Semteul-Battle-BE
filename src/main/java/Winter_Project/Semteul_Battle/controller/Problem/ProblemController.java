@@ -116,7 +116,7 @@ public class ProblemController {
         }
     }
 
-    // 파일 생성 API 수정
+    // 파일 생성
     @PostMapping("/addFile")
     public ResponseEntity<String> generateFiles(@RequestBody AddIOFileDto addIOFileDto,
                                                 @RequestHeader("Authorization") String token) {

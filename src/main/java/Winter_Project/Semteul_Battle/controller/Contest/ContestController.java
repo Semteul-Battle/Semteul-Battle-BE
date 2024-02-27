@@ -88,7 +88,5 @@ public class ContestController {
             log.error("Failed to delete contest", e);
             return "contest delete failed";
         }
-
-
     }
 }

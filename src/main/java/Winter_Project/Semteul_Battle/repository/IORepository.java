@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface IORepository extends JpaRepository<IO, Long> {
     Optional<IO> findById(Long IOId);
+    void deleteByProblem_Id(Long problemId);
+
 }
