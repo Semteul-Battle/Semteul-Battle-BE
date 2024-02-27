@@ -1,5 +1,6 @@
 package Winter_Project.Semteul_Battle.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,11 +17,13 @@ public class ContestantContest {
     private Long id;
 
     // 다대일 관계
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "contestant_id", nullable = false)
     private Contestant contestant;
 
     // 다대일 관계
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "contest_id", nullable = false)
     private Contest contest;

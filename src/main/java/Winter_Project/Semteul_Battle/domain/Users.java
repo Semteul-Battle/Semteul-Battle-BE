@@ -51,7 +51,7 @@ public class Users implements UserDetails {
     private int view;
 
     // 외래키로 사용하는 경우
-
+    @JsonIgnore
     @OneToMany(mappedBy = "users")
     private List<Submit> submits;
 

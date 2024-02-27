@@ -139,7 +139,8 @@ public class ContestMainController {
 
     // 질문 게시판 불러오기
     @GetMapping("/questionsList/{contestId}")
-    public List<ContestQuestion> getQuestionsByContestId(@PathVariable Long contestId) {
+    public List<ContestQuestion> getQuestionsByContestId(@PathVariable Long contestId,
+                                                          @RequestHeader("Authorization") String token) {
 
         Contest contest = contestService.getContestById(contestId);
         return contestLiveService.getQuestionsByContest(contest);
@@ -179,9 +180,8 @@ public class ContestMainController {
 
     // 질문 게시판 댓글 달기
     @PostMapping("/QuestionAnswer")
-    public ResponseEntity<String> answerQuestion(
-            @RequestBody AnswerDTO answerDTO,
-            @RequestHeader("Authorization") String token) {
+    public ResponseEntity<String> answerQuestion(@RequestBody AnswerDTO answerDTO,
+                                                 @RequestHeader("Authorization") String token) {
 
         String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // 토큰에서 loginId 추출
         Optional<Users> userOptional = userRepository.findByLoginId(tokenFromId);

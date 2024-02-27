@@ -37,7 +37,7 @@ public class SubmitService {
 
     // DB에 저장
     @jakarta.transaction.Transactional
-    public Long saveSubmit(SubmitDTO submitDTO) {
+    public synchronized Long saveSubmit(SubmitDTO submitDTO) {
         // SubmitDTO에서 필요한 정보 추출
         String language = submitDTO.getLanguage();
         Long runtime = submitDTO.getRuntime();
