@@ -28,7 +28,6 @@ public class UpdateProblemService {
             problem.setOutput(updateProblemDto.getOutput());
             problem.setTimeLimit(updateProblemDto.getTimeLimit());
             problem.setScore(updateProblemDto.getScore());
-            problem.setPic(updateProblemDto.getPic());
 
             // 업데이트된 문제를 저장
             problemRepository.save(problem);

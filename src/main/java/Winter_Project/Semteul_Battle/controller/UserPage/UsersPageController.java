@@ -25,7 +25,6 @@ import java.util.Optional;
 public class UsersPageController {
 
     private final UserPageService userPageService;
-    private final AmazonS3 amazonS3Client;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 

@@ -35,22 +35,21 @@ public class Problem {
     @Column(nullable = true) // 출력 설명
     private String output;
 
-    @Lob // 문제 사진
-    private byte[] pic;
-
     @Column(nullable = true) // 제한 시간
     private String timeLimit;
 
     private int score; // 문제 배점
 
     // 외래키로 사용하는 경우
-
     @JsonIgnore
     @OneToMany(mappedBy = "problem") // - 제출 테이블에서 참조해감
     private List<Submit> submits;
 
     @OneToMany(mappedBy = "problem") // - 입출력 테이블에서 참조해감
     private List<IO> ios;
+
+    @OneToMany(mappedBy = "problem")
+    private List<ProblemImage> images;
 
     // 대회 기본키
     @JsonIgnore

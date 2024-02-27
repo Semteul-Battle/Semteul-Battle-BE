@@ -31,7 +31,6 @@ public class AddProblemService {
                 .output(addProblemDto.getOutput())
                 .timeLimit(addProblemDto.getTimeLimit())
                 .score(addProblemDto.getScore())
-                .pic(addProblemDto.getPic())
                 .contest(contest) // Contest 객체 설정
                 .build();
 

@@ -12,6 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +33,7 @@ public class ProblemController {
     private final UpdateIOService updateIOService;
     private final IORepository ioRepository;
     private final AddIOService addIOService;
+    private final UploadPictureService uploadPictureService;
 
     // 공백 문제 추가
     @PostMapping("/addProblem")
@@ -130,6 +135,27 @@ public class ProblemController {
             return ResponseEntity.ok("Files generated successfully."); // 파일 생성 완료 메시지 반환
         } else { // 출제자가 아닌 경우
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to perform this action."); // 권한 없음 에러 반환
+        }
+    }
+
+    @PostMapping("/uploadPictures")
+    public ResponseEntity<List<String>> uploadPictures(@RequestHeader("Authorization") String token,
+                                                       @RequestParam("contestId") Long contestId,
+                                                       @RequestParam("problemId") Long problemId,
+                                                       @RequestPart("files") List<MultipartFile> files) {
+        String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // 토큰에서 id 추출
+        Long participantStatus = contestLiveService.whoAreU(contestId, tokenFromId); // 참가자 / 출제자 구분
+
+        if (participantStatus == 0) { // 출제자인 경우
+            try {
+                List<String> imageUrls = uploadPictureService.uploadPictures(files, problemId);
+                return ResponseEntity.ok(imageUrls);
+            } catch (IOException e) {
+                log.error("Failed to upload pictures: {}", e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            }
+        } else { // 출제자가 아닌 경우
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
     }
 }
