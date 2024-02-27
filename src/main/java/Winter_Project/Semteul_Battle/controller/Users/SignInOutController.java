@@ -7,17 +7,14 @@ import Winter_Project.Semteul_Battle.dto.Users.SignOutDto;
 import Winter_Project.Semteul_Battle.service.Users.CustomUserDetailsService;
 import Winter_Project.Semteul_Battle.service.Users.UserService;
 import Winter_Project.Semteul_Battle.util.RedisUtil;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.Authentication;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -34,7 +31,7 @@ public class SignInOutController {
 
     // 로그인
     @PostMapping("/sign-in")
-    public JwtToken signIn(@RequestBody SignInDto signInDto, HttpServletResponse response) {
+    public ResponseEntity<String> signIn(@RequestBody SignInDto signInDto, HttpServletResponse response) {
         String loginId = signInDto.getLoginId();
         String password = signInDto.getPassword();
 
@@ -48,13 +45,16 @@ public class SignInOutController {
             log.info("JWT 토큰 accessToken = {}, refreshToken = {}", jwtToken.getAccessToken(), jwtToken.getRefreshToken());
             redisUtil.setDataExpire(loginId, jwtToken.getRefreshToken(), 86400000);
 
-            return jwtToken;
+            return ResponseEntity.ok("로그인 성공\n"+jwtToken);
         } else {
             // Passwords do not match, 로그인 실패 처리
             log.warn("사용자 '{}'의 로그인 실패", loginId);
-            throw new BadCredentialsException("유효하지 않은 사용자명 또는 비밀번호");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("아이디 혹은 패스워드가 올바르지 않습니다.");
         }
     }
+
+
 
     // 로그아웃
     // loginId 주입 필요
