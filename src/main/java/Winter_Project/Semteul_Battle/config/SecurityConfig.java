@@ -1,5 +1,6 @@
 package Winter_Project.Semteul_Battle.config;
 
+import Winter_Project.Semteul_Battle.config.jwt.JwtAuthenticationEntryPoint;
 import Winter_Project.Semteul_Battle.config.jwt.JwtAuthenticationFilter;
 import Winter_Project.Semteul_Battle.config.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -53,8 +54,13 @@ public class SecurityConfig {
                 .invalidateHttpSession(true) // 세션 무효화
                 .deleteCookies("JSESSIONID") // 세션 쿠키 삭제
                 .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                .and()
                 // JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class).build();
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .build();
+
     }
 
     // password 암호화는 BCryptPasswordEncoder 사용

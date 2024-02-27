@@ -18,5 +18,6 @@ public class UserPageDto {
     private String loginId;
     private String university;
     private String major;
+    private String profile;
     private List<ContestInfoDto> contestList;
 }

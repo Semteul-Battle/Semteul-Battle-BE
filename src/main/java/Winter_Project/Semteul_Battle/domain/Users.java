@@ -44,9 +44,8 @@ public class Users implements UserDetails {
     @Column(nullable = false)
     private int authority;
 
-    @Lob
-    @Column(name = "profile", columnDefinition = "BLOB")
-    private byte[] profile;
+    @Column(name = "profile")
+    private String profile;
 
     private int view;
 
@@ -110,6 +109,10 @@ public class Users implements UserDetails {
     @Override
     public boolean isEnabled() {
         return false;
+    }
+
+    public void saveProfileUrl(String fileUrl) {
+        this.profile = fileUrl;
     }
 
 

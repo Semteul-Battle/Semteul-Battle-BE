@@ -1,6 +1,8 @@
 package Winter_Project.Semteul_Battle.config.jwt;
 
 import Winter_Project.Semteul_Battle.config.jwt.JwtTokenProvider;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -19,16 +21,34 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response,
+                         FilterChain chain) throws IOException, ServletException {
         // 1. Request Header에서 JWT 토큰 추출
         String token = resolveToken((HttpServletRequest) request);
 
         // 2. validateToken으로 토큰 유효성 검사
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            // 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext에 저장
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (token != null) {
+            try {
+                if (jwtTokenProvider.validateToken(token)) {
+                    // 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext에 저장
+                    Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } catch (ExpiredJwtException ex) {
+                // 만료된 토큰 처리
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{ \"error\": \"Unauthorized\", \"message\": \"Expired JWT token\" }");
+                return;
+            } catch (JwtException | IllegalArgumentException ex) {
+                // 올바르지 않은 토큰 처리
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{ \"error\": \"Unauthorized\", \"message\": \"Invalid JWT token\" }");
+                return;
+            }
         }
+
         chain.doFilter(request, response);
     }
 

@@ -16,7 +16,7 @@ public class UserDto {
     private String major;
     private String email;
     private int authority;
-    private byte[] profile;
+    private String profile;
     private int view;
 
     static public UserDto toDto(Users users) {
