@@ -51,10 +51,12 @@ public class Users implements UserDetails {
     private int view;
 
     // 외래키로 사용하는 경우
+
     @JsonIgnore
     @OneToMany(mappedBy = "users")
     private List<Submit> submits;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "users")
     private List<Contestant> contestants;
 
@@ -66,9 +68,11 @@ public class Users implements UserDetails {
     @OneToMany(mappedBy = "answerer")
     private List<ContestQuestion> answerer;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "users")
     private List<ContestNotice> ContestNotices;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "users")
     private List<Examiner> Examiners;
 

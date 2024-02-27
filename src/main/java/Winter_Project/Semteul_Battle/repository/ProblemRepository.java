@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface ProblemRepository extends JpaRepository<Problem, Long> {
     List<Problem> findByContest_Id(Long contestId);
     Optional<Problem> findById(Long problemId);
+    void deleteByContest_Id(Long contestId);
+
 }

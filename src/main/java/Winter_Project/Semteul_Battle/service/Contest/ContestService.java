@@ -24,12 +24,8 @@ public class ContestService {
 
     private final ContestRepository contestRepository;
     private final ExaminerRepository examinerRepository;
-    private final ContestantContestRepository contestantContestRepository;
-    private final UserRepository userRepository;
-    private final ContestantRepository contestantRepository;
     private final ProblemRepository problemRepository;
-    private final ContestNoticeRepository contestNoticeRepository;
-
+    private final IORepository ioRepository;
 
     // 대회 생성
     @Transactional
@@ -50,7 +46,16 @@ public class ContestService {
     // 대회 삭제
     @Transactional
     public void deleteContest(Long contestId) {
+        // 대회에 속한 모든 문제를 찾음
+        List<Problem> problems = problemRepository.findByContest_Id(contestId);
 
+        // 모든 문제에 대응하는 입출력 예시를 삭제
+        for (Problem problem : problems) {
+            ioRepository.deleteByProblem_Id(problem.getId());
+        }
+
+        // 대회와 연관된 모든 정보를 삭제
+        problemRepository.deleteByContest_Id(contestId);
         examinerRepository.deleteByContest_Id(contestId);
         contestRepository.deleteById(contestId);
     }

@@ -23,7 +23,7 @@ public class Contestant {
     @Column(nullable = true)
     private boolean isChecked;
 
-    // 유저
+    // 유저 기본키
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "users_id", nullable = false)

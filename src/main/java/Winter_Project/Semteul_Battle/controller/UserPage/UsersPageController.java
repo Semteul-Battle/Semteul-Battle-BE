@@ -16,18 +16,9 @@ public class UsersPageController {
 
     private final UserPageService userPageService;
 
-//    @GetMapping("/userpage")
-//    public boolean getUserPageInfo(@RequestHeader("Authorization") String token) {
-//        UserPageDto userPageDto = userPageService.  getUserInfoWithContests(token);
-//
-//        if (userPageDto == null) {
-//            return false;
-//        }
-//        return true;
-//    }
-
-    @GetMapping("/userpage")
+    @GetMapping("/userPage")
     public ResponseEntity<UserPageDto> getUserPageInfo(@RequestHeader("Authorization") String token) {
+
         UserPageDto userPageDto = userPageService.getUserInfoWithContests(token);
 
         if (userPageDto == null) {
@@ -37,7 +28,12 @@ public class UsersPageController {
         return ResponseEntity.ok(userPageDto);
     }
 
-
-
-
+    // 대회전적 숨김 기능
+    @PutMapping("/showContests")
+    public ResponseEntity<String> setShowContestsVisibility(
+            @RequestHeader("Authorization") String token,
+            @RequestParam(value = "visible", defaultValue = "true") boolean visible) {
+        userPageService.setShowContestsVisibility(token, visible);
+        return ResponseEntity.ok("대회 기록 표시 설정이 변경되었습니다.");
+    }
 }
