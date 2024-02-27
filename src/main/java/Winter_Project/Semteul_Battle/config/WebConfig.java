@@ -18,4 +18,3 @@ public class WebConfig implements WebMvcConfigurer {
                 .maxAge(3600);
     }
 }
-// (참고)https://velog.io/@yoonuk/Spring-Boot-CORS-%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0
