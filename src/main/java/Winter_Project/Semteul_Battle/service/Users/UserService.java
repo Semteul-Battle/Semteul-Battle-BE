@@ -5,6 +5,7 @@ import Winter_Project.Semteul_Battle.domain.Users;
 import Winter_Project.Semteul_Battle.dto.JwtToken;
 import Winter_Project.Semteul_Battle.dto.Users.SignUpDto;
 import Winter_Project.Semteul_Battle.dto.Users.UserDto;
+import Winter_Project.Semteul_Battle.dto.Users.UserInquiryDto;
 import Winter_Project.Semteul_Battle.repository.UserRepository;
 import Winter_Project.Semteul_Battle.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -63,5 +65,18 @@ public class UserService implements UserServiceImpl {
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + loginId));
     }
 
+    public UserInquiryDto getUserInformation(String token) {
+
+        String loginId = jwtTokenProvider.extractLoginIdFromToken(token);
+
+        Optional<Users> user = userRepository.findByLoginId(loginId);
+
+        UserInquiryDto userInquiryDto = new UserInquiryDto();
+        userInquiryDto.setLoginId(user.get().getLoginId());
+        userInquiryDto.setName(user.get().getName());
+        userInquiryDto.setRole(user.get().getRoles().toString()); // 여러 역할 중 첫 번째 역할을 가져옴
+
+        return userInquiryDto;
+    }
 
 }
