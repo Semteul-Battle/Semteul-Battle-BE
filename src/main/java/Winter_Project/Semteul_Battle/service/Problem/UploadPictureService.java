@@ -38,11 +38,44 @@ public class UploadPictureService {
             imageUrls.add(fileUrl);
 
             // 문제 이미지 저장
-//            ProblemImage problemImage = new ProblemImage();
-//            problemImage.setProblem(problemRepository.findById(problemId).orElse(null)); // Problem 엔티티 참조 설정
-//            problemImage.setImageUrl(fileUrl);
-//            problemImageRepository.save(problemImage);
+            ProblemImage problemImage = new ProblemImage();
+            problemImage.setProblem(problemRepository.findById(problemId).orElse(null)); // Problem 엔티티 참조 설정
+            problemImage.setImageUrl(fileUrl);
+            problemImageRepository.save(problemImage);
         }
         return imageUrls;
+    }
+
+    // 문제 사진 수정
+    public List<String> updatePictures(List<MultipartFile> files, Long problemId) throws IOException {
+        // 기존 사진 삭제
+        List<ProblemImage> existingImages = problemImageRepository.findByProblemId(problemId);
+        for (ProblemImage existingImage : existingImages) {
+            amazonS3Client.deleteObject(bucket, "problemPictures/" + existingImage.getImageUrl());
+            problemImageRepository.delete(existingImage);
+        }
+
+        // 새로운 사진 추가
+        List<String> newImageUrls = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String fileName = file.getOriginalFilename();
+            String fileUrl = "https://" + bucket + ".s3.amazonaws.com/problemPictures/" + fileName;
+
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(file.getContentType());
+            metadata.setContentLength(file.getSize());
+
+            amazonS3Client.putObject(bucket, "problemPictures/" + fileName, file.getInputStream(), metadata);
+            newImageUrls.add(fileUrl);
+
+            // 문제 이미지 저장
+            ProblemImage problemImage = new ProblemImage();
+            problemImage.setProblem(problemRepository.findById(problemId).orElse(null)); // Problem 엔티티 참조 설정
+            problemImage.setImageUrl(fileUrl);
+            problemImageRepository.save(problemImage);
+        }
+
+        // 업데이트된 이미지 URL 목록 반환
+        return newImageUrls;
     }
 }

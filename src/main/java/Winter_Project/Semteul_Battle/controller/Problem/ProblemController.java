@@ -131,13 +131,15 @@ public class ProblemController {
 
         if (participantStatus == 0) { // 출제자가 맞는 경우
             // 입력 및 출력 파일 생성
-            addProblemService.createInputOutputFiles(addIOFileDto.getInputFile(), addIOFileDto.getOutputFile());
+            addProblemService.createInputOutputFiles(addIOFileDto.getInputFile(), addIOFileDto.getOutputFile(), addIOFileDto.getNumber());
             return ResponseEntity.ok("Files generated successfully."); // 파일 생성 완료 메시지 반환
         } else { // 출제자가 아닌 경우
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to perform this action."); // 권한 없음 에러 반환
         }
     }
 
+
+    // 문제 사진 넣기
     @PostMapping("/uploadPictures")
     public ResponseEntity<List<String>> uploadPictures(@RequestHeader("Authorization") String token,
                                                        @RequestParam("contestId") Long contestId,
@@ -152,6 +154,33 @@ public class ProblemController {
                 return ResponseEntity.ok(imageUrls);
             } catch (IOException e) {
                 log.error("Failed to upload pictures: {}", e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            }
+        } else { // 출제자가 아닌 경우
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+    }
+
+    // 문제 사진 수정
+    @PatchMapping("/updatePictures")
+    public ResponseEntity<List<String>> updatePictures(@RequestHeader("Authorization") String token,
+                                                       @RequestParam("problemId") Long problemId,
+                                                       @RequestParam("contestId") Long contestId,
+                                                       @RequestPart("files") List<MultipartFile> files) {
+        String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // 토큰에서 id 추출
+        Long participantStatus = contestLiveService.whoAreU(contestId, tokenFromId); // 참가자 / 출제자 구분
+
+        if (participantStatus == 0) { // 출제자인 경우
+            try {
+                List<String> updatedImageUrls = uploadPictureService.updatePictures(files, problemId);
+                if (updatedImageUrls != null && !updatedImageUrls.isEmpty()) {
+                    return ResponseEntity.ok(updatedImageUrls);
+                } else {
+                    // 수정 실패
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+                }
+            } catch (IOException e) {
+                log.error("Failed to update pictures: {}", e.getMessage());
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
             }
         } else { // 출제자가 아닌 경우
