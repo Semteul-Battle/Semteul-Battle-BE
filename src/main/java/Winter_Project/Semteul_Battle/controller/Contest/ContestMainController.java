@@ -28,11 +28,7 @@ public class ContestMainController {
     private final JwtTokenProvider jwtTokenProvider;
     private final ContestService contestService;
     private final ContestLiveService contestLiveService;
-    private final ProblemRepository problemRepository;
-    private final ContestNoticeRepository contestNoticeRepository;
     private final UserRepository userRepository;
-    private final ContestQuestionRepository contestQuestionRepository;
-    private final ContestRepository contestRepository;
 
     // 실시간 대회 - 참가자 권한
     @GetMapping("/contestMain")

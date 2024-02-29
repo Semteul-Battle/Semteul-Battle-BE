@@ -22,7 +22,7 @@ public class ContestApplicationController {
                                                @RequestHeader("Authorization") String token) {
         boolean result = contestApplicationService.applyContest(contestApplicationDto, token);
         if (result) {
-            return ResponseEntity.ok("대회 신청이 완료되었습니다.");
+            return ResponseEntity.ok(HttpStatus.OK+"대회 신청이 완료되었습니다.");
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("대회 신청 중 오류가 발생했습니다.");
         }

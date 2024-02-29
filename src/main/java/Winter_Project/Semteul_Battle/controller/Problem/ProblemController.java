@@ -132,9 +132,9 @@ public class ProblemController {
         if (participantStatus == 0) { // 출제자가 맞는 경우
             // 입력 및 출력 파일 생성
             addProblemService.createInputOutputFiles(addIOFileDto.getInputFile(), addIOFileDto.getOutputFile(), addIOFileDto.getNumber());
-            return ResponseEntity.ok("Files generated successfully."); // 파일 생성 완료 메시지 반환
+            return ResponseEntity.ok("파일 생성을 완료하였습니다."); // 파일 생성 완료 메시지 반환
         } else { // 출제자가 아닌 경우
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to perform this action."); // 권한 없음 에러 반환
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다."); // 권한 없음 에러 반환
         }
     }
 

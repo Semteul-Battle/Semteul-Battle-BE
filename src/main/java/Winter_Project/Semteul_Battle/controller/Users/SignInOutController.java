@@ -45,7 +45,7 @@ public class SignInOutController {
             log.info("JWT 토큰 accessToken = {}, refreshToken = {}", jwtToken.getAccessToken(), jwtToken.getRefreshToken());
             redisUtil.setDataExpire(loginId, jwtToken.getRefreshToken(), 86400000);
 
-            return ResponseEntity.ok("로그인 성공\n"+jwtToken);
+            return ResponseEntity.ok("로그인 성공\n"+"AccessToken : "+jwtToken.getAccessToken()+"\n"+"RefreshToken : "+jwtToken.getRefreshToken());
         } else {
             // Passwords do not match, 로그인 실패 처리
             log.warn("사용자 '{}'의 로그인 실패", loginId);

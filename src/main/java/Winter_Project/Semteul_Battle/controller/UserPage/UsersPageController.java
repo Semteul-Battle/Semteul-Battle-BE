@@ -31,6 +31,7 @@ public class UsersPageController {
     @Value("#{environment['cloud.aws.s3.bucketName']}")
     private String bucket;
 
+    // 마이페이지 조회
     @GetMapping("/userPage")
     public ResponseEntity<UserPageDto> getUserPageInfo(@RequestHeader("Authorization") String token) {
 

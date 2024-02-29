@@ -12,10 +12,8 @@ import Winter_Project.Semteul_Battle.repository.ContestantRepository;
 import Winter_Project.Semteul_Battle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.Optional;
 
 @Service

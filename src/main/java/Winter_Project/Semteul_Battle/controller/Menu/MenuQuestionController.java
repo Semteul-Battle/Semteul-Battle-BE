@@ -27,7 +27,7 @@ public class MenuQuestionController {
     private final UserRepository userRepository;
 
     // 질문 생성
-    @PostMapping("/question")
+    @PostMapping("/createQuestion")
     public ResponseEntity<String> createQuestion(@RequestBody QuestionDto questionDto,
                                                  @RequestHeader("Authorization") String token) {
         String loginId = jwtTokenProvider.extractLoginIdFromToken(token);

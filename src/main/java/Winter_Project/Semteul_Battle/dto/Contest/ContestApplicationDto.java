@@ -14,6 +14,4 @@ import java.util.List;
 @AllArgsConstructor
 public class ContestApplicationDto {
     private String contestName;
-    private String loginId;
-    private String accessToken;
 }
