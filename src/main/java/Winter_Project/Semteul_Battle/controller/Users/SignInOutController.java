@@ -77,18 +77,22 @@ public class SignInOutController {
 
     // accessToken 재발급 요청
     @PostMapping("/renewalToken")
-    public ResponseEntity<JwtToken> renewalToken(@RequestParam String loginId) {
+    public ResponseEntity<String> renewalToken(@RequestParam String loginId) {
 
         // redis에 들어있는 refreshToken을 추출함
-        String refreshToken = redisUtil.getData(loginId);
-        JwtToken newAccessToken = userService.refreshToken(refreshToken);
+        String refreshTokenFromId = redisUtil.getData(loginId);
 
-//        if (jwtTokenProvider.validateToken(refreshToken)) {
-//            JwtToken newAccessToken = userService.refreshToken(refreshToken);
-//            return ResponseEntity.ok(newAccessToken);
-//        } else {
-//            return ResponseEntity.badRequest().build();
-//        }
-        return ResponseEntity.ok(newAccessToken);
+        // refreshToken의 유효성을 체크하고, 존재유무를 체크하여 검증
+        if (refreshTokenFromId != null) {
+            if (jwtTokenProvider.validateToken(refreshTokenFromId)) {
+                JwtToken newToken = userService.tokenRenewal(loginId);
+                return ResponseEntity.ok("토큰이 정상적으로 발급되었습니다."+"\n"+
+                        "AccessToken : "+newToken.getAccessToken()+"\n"+"RefreshToken : "+newToken.getRefreshToken());
+            } else {
+                return ResponseEntity.badRequest().body("토큰이 만료되었습니다.");
+            }
+        } else {
+            return ResponseEntity.badRequest().body("토큰이 존재하지 않습니다.");
+        }
     }
 }

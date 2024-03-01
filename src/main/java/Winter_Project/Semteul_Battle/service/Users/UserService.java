@@ -30,7 +30,6 @@ public class UserService implements UserServiceImpl {
     private final UserRepository userRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final RedisUtil redisUtil;
     private final CustomUserDetailsService customUserDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -81,14 +80,7 @@ public class UserService implements UserServiceImpl {
         return userInquiryDto;
     }
 
-    public JwtToken refreshToken(String refreshToken) {
-        // refresh token의 유효성을 검사
-        if (!jwtTokenProvider.validateToken(refreshToken)) {
-            throw new RuntimeException("유효하지 않은 refresh token입니다.");
-        }
-
-        // refresh token을 복호화하여 loginId를 추출
-        String loginId = jwtTokenProvider.extractLoginIdFromToken(refreshToken);
+    public JwtToken tokenRenewal(String loginId) {
 
         // 유효한 refresh token이라면 새로운 access token 생성
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(loginId);
