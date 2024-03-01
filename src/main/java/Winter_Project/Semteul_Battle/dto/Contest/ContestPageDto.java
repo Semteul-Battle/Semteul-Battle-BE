@@ -1,6 +1,7 @@
 package Winter_Project.Semteul_Battle.dto.Contest;
 
 import Winter_Project.Semteul_Battle.domain.Contest;
+import Winter_Project.Semteul_Battle.domain.Examiner;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 public class ContestPageDto {
     private List<Contest> contests;
+    private List<Long> examinerIds;
+    private List<Examiner> examiners;
     private int currentPage;
     private int totalPages;
     private long totalItems;

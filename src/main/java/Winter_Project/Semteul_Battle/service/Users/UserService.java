@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ public class UserService implements UserServiceImpl {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisUtil redisUtil;
+    private final CustomUserDetailsService customUserDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
@@ -77,6 +79,23 @@ public class UserService implements UserServiceImpl {
         userInquiryDto.setRole(user.get().getRoles().toString()); // 여러 역할 중 첫 번째 역할을 가져옴
 
         return userInquiryDto;
+    }
+
+    public JwtToken refreshToken(String refreshToken) {
+        // refresh token의 유효성을 검사
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new RuntimeException("유효하지 않은 refresh token입니다.");
+        }
+
+        // refresh token을 복호화하여 loginId를 추출
+        String loginId = jwtTokenProvider.extractLoginIdFromToken(refreshToken);
+
+        // 유효한 refresh token이라면 새로운 access token 생성
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(loginId);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        JwtToken newAccessToken = jwtTokenProvider.generateToken(authentication);
+
+        return newAccessToken;
     }
 
 }

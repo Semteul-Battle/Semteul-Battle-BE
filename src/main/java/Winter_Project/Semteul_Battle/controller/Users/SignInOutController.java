@@ -54,8 +54,6 @@ public class SignInOutController {
         }
     }
 
-
-
     // 로그아웃
     // loginId 주입 필요
     @PostMapping("/sign-out")
@@ -77,4 +75,20 @@ public class SignInOutController {
         return false;
     }
 
+    // accessToken 재발급 요청
+    @PostMapping("/renewalToken")
+    public ResponseEntity<JwtToken> renewalToken(@RequestParam String loginId) {
+
+        // redis에 들어있는 refreshToken을 추출함
+        String refreshToken = redisUtil.getData(loginId);
+        JwtToken newAccessToken = userService.refreshToken(refreshToken);
+
+//        if (jwtTokenProvider.validateToken(refreshToken)) {
+//            JwtToken newAccessToken = userService.refreshToken(refreshToken);
+//            return ResponseEntity.ok(newAccessToken);
+//        } else {
+//            return ResponseEntity.badRequest().build();
+//        }
+        return ResponseEntity.ok(newAccessToken);
+    }
 }
