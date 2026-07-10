@@ -2,7 +2,7 @@ package Winter_Project.Semteul_Battle.domain.user.controller;
 
 import Winter_Project.Semteul_Battle.global.security.jwt.JwtTokenProvider;
 import Winter_Project.Semteul_Battle.domain.user.entity.Users;
-import Winter_Project.Semteul_Battle.domain.user.dto.UserPageDto;
+import Winter_Project.Semteul_Battle.domain.user.dto.response.UserPageDto;
 import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
 import Winter_Project.Semteul_Battle.domain.user.service.UserPageService;
 import com.amazonaws.services.s3.AmazonS3;

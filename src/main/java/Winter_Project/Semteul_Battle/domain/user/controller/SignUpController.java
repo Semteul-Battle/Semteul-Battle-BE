@@ -1,8 +1,8 @@
 package Winter_Project.Semteul_Battle.domain.user.controller;
 
-import Winter_Project.Semteul_Battle.domain.mail.dto.MailDto;
-import Winter_Project.Semteul_Battle.domain.user.dto.SignUpDto;
-import Winter_Project.Semteul_Battle.domain.user.dto.UserDto;
+import Winter_Project.Semteul_Battle.domain.mail.dto.request.MailDto;
+import Winter_Project.Semteul_Battle.domain.user.dto.request.SignUpDto;
+import Winter_Project.Semteul_Battle.domain.user.dto.response.UserDto;
 import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
 import Winter_Project.Semteul_Battle.domain.mail.service.EmailService;
 import Winter_Project.Semteul_Battle.domain.user.service.UserService;

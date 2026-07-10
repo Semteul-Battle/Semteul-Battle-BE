@@ -2,7 +2,7 @@ package Winter_Project.Semteul_Battle.domain.contest.controller;
 
 import Winter_Project.Semteul_Battle.domain.contest.entity.Contest;
 import Winter_Project.Semteul_Battle.domain.contest.entity.Examiner;
-import Winter_Project.Semteul_Battle.domain.contest.dto.ContestPageDto;
+import Winter_Project.Semteul_Battle.domain.contest.dto.response.ContestPageDto;
 import Winter_Project.Semteul_Battle.domain.contest.repository.ExaminerRepository;
 import Winter_Project.Semteul_Battle.domain.contest.service.ContestPageService;
 

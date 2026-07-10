@@ -4,7 +4,7 @@ import Winter_Project.Semteul_Battle.global.security.jwt.JwtTokenProvider;
 import Winter_Project.Semteul_Battle.domain.contest.entity.Contest;
 import Winter_Project.Semteul_Battle.domain.contest.entity.Examiner;
 import Winter_Project.Semteul_Battle.domain.user.entity.Users;
-import Winter_Project.Semteul_Battle.domain.contest.dto.CreateContestDto;
+import Winter_Project.Semteul_Battle.domain.contest.dto.request.CreateContestDto;
 import Winter_Project.Semteul_Battle.domain.contest.repository.ExaminerRepository;
 import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
 import Winter_Project.Semteul_Battle.domain.contest.service.ContestService;

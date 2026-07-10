@@ -2,10 +2,10 @@ package Winter_Project.Semteul_Battle.domain.menu.controller;
 
 import Winter_Project.Semteul_Battle.global.security.jwt.JwtTokenProvider;
 import Winter_Project.Semteul_Battle.domain.user.entity.Users;
-import Winter_Project.Semteul_Battle.domain.menu.dto.question.QuestionDeleteDto;
-import Winter_Project.Semteul_Battle.domain.menu.dto.question.QuestionDto;
-import Winter_Project.Semteul_Battle.domain.menu.dto.question.QuestionPageDto;
-import Winter_Project.Semteul_Battle.domain.menu.dto.question.QuestionUpdateDto;
+import Winter_Project.Semteul_Battle.domain.menu.dto.request.QuestionDeleteDto;
+import Winter_Project.Semteul_Battle.domain.menu.dto.request.QuestionDto;
+import Winter_Project.Semteul_Battle.domain.menu.dto.response.QuestionPageDto;
+import Winter_Project.Semteul_Battle.domain.menu.dto.request.QuestionUpdateDto;
 import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
 import Winter_Project.Semteul_Battle.domain.menu.service.QuestionService;
 import lombok.RequiredArgsConstructor;

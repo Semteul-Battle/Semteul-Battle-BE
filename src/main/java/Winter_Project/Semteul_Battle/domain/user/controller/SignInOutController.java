@@ -2,8 +2,8 @@ package Winter_Project.Semteul_Battle.domain.user.controller;
 
 import Winter_Project.Semteul_Battle.global.security.jwt.JwtTokenProvider;
 import Winter_Project.Semteul_Battle.global.security.dto.JwtToken;
-import Winter_Project.Semteul_Battle.domain.user.dto.SignInDto;
-import Winter_Project.Semteul_Battle.domain.user.dto.SignOutDto;
+import Winter_Project.Semteul_Battle.domain.user.dto.request.SignInDto;
+import Winter_Project.Semteul_Battle.domain.user.dto.request.SignOutDto;
 import Winter_Project.Semteul_Battle.domain.user.service.CustomUserDetailsService;
 import Winter_Project.Semteul_Battle.domain.user.service.UserService;
 import Winter_Project.Semteul_Battle.global.util.RedisUtil;
