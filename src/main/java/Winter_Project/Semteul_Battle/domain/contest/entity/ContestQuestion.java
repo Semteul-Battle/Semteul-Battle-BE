@@ -1,0 +1,58 @@
+package Winter_Project.Semteul_Battle.domain.contest.entity;
+
+
+import Winter_Project.Semteul_Battle.domain.contest.entity.*;
+import Winter_Project.Semteul_Battle.domain.problem.entity.*;
+import Winter_Project.Semteul_Battle.domain.user.entity.*;
+import Winter_Project.Semteul_Battle.domain.menu.entity.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.sql.Timestamp;
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ContestQuestion {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(updatable = false, unique = true, nullable = false)
+    private Long id;
+
+    @Column(nullable = false)
+    private String question; // ??遺얘턁??????????鶯????饔낅떽??????猷고ｇ땟???
+    @Column(nullable = false)
+    private String content; // ??遺얘턁??????????鶯?????????살몖??
+    @Column(nullable = false)
+    private Timestamp questionTime; // ??遺얘턁??????????鶯???????
+    @Column(nullable = true)
+    private String answer; // ??遺얘턁??????????鶯?????
+    @Column(nullable = true)
+    private Timestamp answerTime; // ??遺얘턁??????????鶯???????????
+    // ???(??遺얘턁??????????鶯?? ??????꾩룆梨띰쭕??力?肉???
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "questioner_id")
+    private Users questioner;
+
+    // ???(????? ??????꾩룆梨띰쭕??力?肉???
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "answerer_id", nullable = true)
+    private Users answerer;
+
+    // ??????????꾩룆梨띰쭕??力?肉???
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "contest_id")
+    private Contest contestId;
+
+    public Users getAnswerer() {
+        return this.answerer;
+}
+
+}
