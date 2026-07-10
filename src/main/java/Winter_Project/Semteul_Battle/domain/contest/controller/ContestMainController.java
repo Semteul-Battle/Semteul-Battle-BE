@@ -64,16 +64,14 @@ public class ContestMainController {
 
     @GetMapping("/problemList")
     public List<ContestInfoDTO> getProblemsByContestId(
-            @RequestParam Long contestId,
-            @AuthenticationPrincipal(expression = "username") String loginId
+            @RequestParam Long contestId
     ) {
         return contestLiveService.getProblemsByContestId(contestId);
     }
 
     @GetMapping("/problemInfo")
     public List<Problem> getProblemsInfo(
-            @RequestParam Long contestId,
-            @AuthenticationPrincipal(expression = "username") String loginId
+            @RequestParam Long contestId
     ) {
         return contestLiveService.getProblemsInfo(contestId);
     }
@@ -126,8 +124,7 @@ public class ContestMainController {
     public SubmitPageDto<SubmitDTO> getSubmitsList(
             @RequestParam Long contestId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @AuthenticationPrincipal(expression = "username") String loginId
+            @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
         return contestLiveService.getSubmitsWithProblems(contestId, pageable);
@@ -135,8 +132,7 @@ public class ContestMainController {
 
     @GetMapping("/questionsList/{contestId}")
     public List<ContestQuestion> getQuestionsByContestId(
-            @PathVariable Long contestId,
-            @AuthenticationPrincipal(expression = "username") String loginId
+            @PathVariable Long contestId
     ) {
         Contest contest = contestService.getContestById(contestId);
         return contestLiveService.getQuestionsByContest(contest);
@@ -156,8 +152,7 @@ public class ContestMainController {
 
     @DeleteMapping("/deleteQuestion/{questionId}")
     public BaseResponse<Void> deleteContestQuestion(
-            @PathVariable Long questionId,
-            @AuthenticationPrincipal(expression = "username") String loginId
+            @PathVariable Long questionId
     ) {
         contestLiveService.deleteContestQuestion(questionId);
         return BaseResponse.onSuccess(SuccessStatus.OK, null);
