@@ -3,11 +3,11 @@ services:
     image: postgres:17
     container_name: semteul-postgres
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
     environment:
       POSTGRES_DB: ${DB_NAME:-semteul_battle}
       POSTGRES_USER: ${DB_USERNAME:-semteul}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-semteul}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
     volumes:
       - semteul-postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -20,12 +20,19 @@ services:
     image: redis:7.4-alpine
     container_name: semteul-battle-redis
     ports:
-      - "${REDIS_PORT:-6379}:6379"
-    command: redis-server --appendonly yes
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --requirepass
+      - ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     volumes:
       - semteul-redis-data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "REDISCLI_AUTH=$${REDIS_PASSWORD} redis-cli ping"]
       interval: 10s
       timeout: 3s
       retries: 5
