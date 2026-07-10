@@ -77,7 +77,7 @@ public class GlobalExceptionAdvice extends ResponseEntityExceptionHandler {
             HttpStatusCode status,
             WebRequest request
     ) {
-        return handleExceptionInternal(e, ErrorStatus._BAD_REQUEST, e.getParameterName() + ": ?????밸븶??????거??????ル봿?????????낆젵.", request);
+        return handleExceptionInternal(e, ErrorStatus._BAD_REQUEST, e.getParameterName() + ": 필수 요청 파라미터가 누락되었습니다.", request);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class GlobalExceptionAdvice extends ResponseEntityExceptionHandler {
         e.getBindingResult().getFieldErrors().forEach(fieldError ->
                 errors.merge(
                         fieldError.getField(),
-                        fieldError.getDefaultMessage() == null ? "????癲????ル봿?????????밸븶?癲??????낆젵." : fieldError.getDefaultMessage(),
+                        fieldError.getDefaultMessage() == null ? "요청 값이 올바르지 않습니다." : fieldError.getDefaultMessage(),
                         (previous, current) -> previous + ", " + current
                 )
         );

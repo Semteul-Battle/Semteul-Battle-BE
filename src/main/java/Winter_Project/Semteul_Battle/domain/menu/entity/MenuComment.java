@@ -26,15 +26,15 @@ public class MenuComment {
     @Column(updatable = false, unique = true, nullable = false)
     private Long id;
 
-    // ??? ???????ㅻ쑄??
+
     @Column(nullable = true)
 private String content;
 
-    // ????????????
+
     @Column(nullable = true)
 private Timestamp time;
 
-    // ???????
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "users_id", nullable = false)

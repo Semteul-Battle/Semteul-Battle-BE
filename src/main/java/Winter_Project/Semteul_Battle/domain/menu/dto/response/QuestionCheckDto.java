@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuestionCheckDto {
-    private String loginId; // ????????loginId
+    private String loginId;
 private String title;
     private String content;
     private Timestamp time;

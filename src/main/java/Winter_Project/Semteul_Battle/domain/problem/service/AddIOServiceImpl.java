@@ -20,7 +20,7 @@ public class AddIOServiceImpl implements AddIOService {
 
     public void IOFrame(AddIODto addIODto) {
         Problem problem = problemRepository.findById(addIODto.getProblemId())
-                .orElseThrow(() -> new ProblemException(ErrorStatus._NOT_FOUND, "????????嶺???傭?끆???嶺뚮?猷볠꽴??饔낅떽???????????????깅즽????????놁졄."));
+                .orElseThrow(() -> new ProblemException(ErrorStatus._NOT_FOUND, "문제를 찾을 수 없습니다."));
 
         IO io = IO.builder()
                 .input(addIODto.getInput())

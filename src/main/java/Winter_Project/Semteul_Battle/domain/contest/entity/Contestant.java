@@ -24,17 +24,17 @@ public class Contestant {
     @Column(updatable = false, unique = true, nullable = false)
     private Long id;
 
-    // ??????⑤９???????耀붾굝??????????
+
     @Column(nullable = true)
 private boolean isChecked;
 
-    // ??? ?????????
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "users_id", nullable = false)
     private Users users;
 
-    // ?????????????
+
     @JsonIgnore
     @OneToMany(mappedBy = "contestant")
     private List<ContestantContest> contestantContests;

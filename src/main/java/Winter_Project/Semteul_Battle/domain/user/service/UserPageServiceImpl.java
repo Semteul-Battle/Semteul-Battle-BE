@@ -4,7 +4,6 @@ package Winter_Project.Semteul_Battle.domain.user.service;
 
 import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
 import Winter_Project.Semteul_Battle.domain.user.exception.UserException;
-import Winter_Project.Semteul_Battle.global.security.jwt.JwtTokenProvider;
 import Winter_Project.Semteul_Battle.domain.contest.entity.Contest;
 import Winter_Project.Semteul_Battle.domain.contest.entity.Contestant;
 import Winter_Project.Semteul_Battle.domain.contest.entity.ContestantContest;
@@ -33,7 +32,6 @@ public class UserPageServiceImpl implements UserPageService {
     private final UserRepository userRepository;
     private final ContestantRepository contestantRepository;
     private final ContestantContestRepository contestantContestRepository;
-    private final JwtTokenProvider jwtTokenProvider;
     private final AmazonS3 amazonS3Client;
 
     @Value("#{environment['cloud.aws.s3.bucketName']}")
@@ -41,8 +39,7 @@ public class UserPageServiceImpl implements UserPageService {
 
 
     @Transactional(readOnly = true)
-    public UserPageDto getUserInfoWithContests(String token) {
-        String loginId = jwtTokenProvider.extractLoginIdFromToken(token);
+    public UserPageDto getUserInfoWithContests(String loginId) {
         Optional<Users> userOptional = userRepository.findByLoginId(loginId);
 
         if (!userOptional.isPresent()) {
@@ -57,10 +54,10 @@ public class UserPageServiceImpl implements UserPageService {
         userPageDto.setMajor(user.getMajor());
         userPageDto.setProfile(user.getProfile());
 
-        // ??????????????됰븗???? ???嚥싲갭큔???????ル늉????轅붽틓????筌뤾쑴裕?棺堉?뙴???
+
 boolean showContestVisibility = user.getView() == 1;
 
-        // ??????????????됰븗???? ???嚥싲갭큔????true?????????????轅붽틓????????????ル늉????轅붽틓????筌뤾쑴裕?????諛몃마??λ????饔낅떽???壤굿?戮㏐광??
+
 if (showContestVisibility) {
 List<Contestant> contestants = contestantRepository.findByUsers_Id(user.getId());
             List<ContestInfoDto> contestInfoList = new ArrayList<>();
@@ -83,21 +80,20 @@ List<Contestant> contestants = contestantRepository.findByUsers_Id(user.getId())
         return userPageDto;
     }
 
-    // ??????????? ????????
+
 @Transactional
-    public void setShowContestsVisibility(String token, boolean visible) {
-        String loginId = jwtTokenProvider.extractLoginIdFromToken(token);
+    public void setShowContestsVisibility(String loginId, boolean visible) {
         Optional<Users> userOptional = userRepository.findByLoginId(loginId);
 
         if (userOptional.isPresent()) {
             Users user = userOptional.get();
-            user.setView(visible ? 1 : 0); // visible ????ル늉?????????怨뺤떪??view ?????諛몃마???????嚥싲갭큔???            userRepository.save(user);
+            user.setView(visible ? 1 : 0);
         } else {
-            throw new UserException(ErrorStatus._NOT_FOUND, "?????? ?饔낅떽???????????????깅즽????????놁졄.");
+            throw new UserException(ErrorStatus._NOT_FOUND, "사용자를 찾을 수 없습니다.");
         }
     }
 
-    // ?????諛몃마??λ???????嚥싲갭큔???
+
 @Transactional
     public String uploadUserProfilePic(MultipartFile file) throws IOException {
         String fileName = file.getOriginalFilename();

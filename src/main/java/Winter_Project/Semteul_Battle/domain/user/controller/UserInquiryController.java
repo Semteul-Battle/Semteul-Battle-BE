@@ -1,30 +1,28 @@
 package Winter_Project.Semteul_Battle.domain.user.controller;
 
 import Winter_Project.Semteul_Battle.domain.user.dto.response.UserInquiryDto;
-import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
+import Winter_Project.Semteul_Battle.domain.user.exception.UserException;
 import Winter_Project.Semteul_Battle.domain.user.service.UserService;
+import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserInquiryController {
+
     private final UserService userService;
 
-    @GetMapping("/inquiryUser")
-    public ResponseEntity<UserInquiryDto> getUserInformation(@RequestHeader("Authorization") String token) {
-
-        UserInquiryDto userInquiryDto = userService.getUserInformation(token);
-
-        if (userInquiryDto != null) {
-            return new ResponseEntity<>(userInquiryDto, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @GetMapping("/inquiry")
+    public UserInquiryDto getUserInformation(@AuthenticationPrincipal(expression = "username") String loginId) {
+        UserInquiryDto userInquiryDto = userService.getUserInformation(loginId);
+        if (userInquiryDto == null) {
+            throw new UserException(ErrorStatus._NOT_FOUND, "사용자 정보를 찾을 수 없습니다.");
         }
+        return userInquiryDto;
     }
 }

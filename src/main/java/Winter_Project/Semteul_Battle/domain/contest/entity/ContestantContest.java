@@ -21,13 +21,13 @@ public class ContestantContest {
     @Column(updatable = false, unique = true, nullable = false)
     private Long id;
 
-    // ??????????怨멸텛???
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "contestant_id", nullable = false)
     private Contestant contestant;
 
-    // ??????????怨멸텛???
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "contest_id", nullable = false)

@@ -1,34 +1,41 @@
 package Winter_Project.Semteul_Battle.domain.contest.controller;
 
-
-
-import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
+import Winter_Project.Semteul_Battle.domain.contest.dto.request.AnswerDTO;
+import Winter_Project.Semteul_Battle.domain.contest.dto.request.ContestNoticeDTO;
+import Winter_Project.Semteul_Battle.domain.contest.dto.request.ContestQuestionDTO;
+import Winter_Project.Semteul_Battle.domain.contest.dto.request.SubmitDTO;
+import Winter_Project.Semteul_Battle.domain.contest.dto.response.ContestInfoDTO;
+import Winter_Project.Semteul_Battle.domain.contest.dto.response.SubmitPageDto;
+import Winter_Project.Semteul_Battle.domain.contest.entity.Contest;
+import Winter_Project.Semteul_Battle.domain.contest.entity.ContestNotice;
+import Winter_Project.Semteul_Battle.domain.contest.entity.ContestQuestion;
 import Winter_Project.Semteul_Battle.domain.contest.exception.ContestException;
-import Winter_Project.Semteul_Battle.global.security.jwt.JwtTokenProvider;
-import Winter_Project.Semteul_Battle.domain.contest.entity.*;
-import Winter_Project.Semteul_Battle.domain.problem.entity.*;
-import Winter_Project.Semteul_Battle.domain.user.entity.*;
-import Winter_Project.Semteul_Battle.domain.menu.entity.*;
-import Winter_Project.Semteul_Battle.domain.contest.dto.request.*;
-import Winter_Project.Semteul_Battle.domain.contest.dto.response.*;
-import Winter_Project.Semteul_Battle.domain.contest.repository.*;
-import Winter_Project.Semteul_Battle.domain.problem.repository.*;
-import Winter_Project.Semteul_Battle.domain.user.repository.*;
-import Winter_Project.Semteul_Battle.domain.menu.repository.*;
 import Winter_Project.Semteul_Battle.domain.contest.service.ContestLiveService;
 import Winter_Project.Semteul_Battle.domain.contest.service.ContestService;
+import Winter_Project.Semteul_Battle.domain.problem.entity.Problem;
+import Winter_Project.Semteul_Battle.domain.user.entity.Users;
+import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
+import Winter_Project.Semteul_Battle.global.response.BaseResponse;
+import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
+import Winter_Project.Semteul_Battle.global.status.SuccessStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -36,171 +43,140 @@ import java.util.stream.Collectors;
 @RequestMapping("/contests")
 public class ContestMainController {
 
-    private final JwtTokenProvider jwtTokenProvider;
     private final ContestService contestService;
     private final ContestLiveService contestLiveService;
     private final UserRepository userRepository;
 
-    // ??????살퓢???????- ?饔낅떽????怨뚮옩????????????
-@GetMapping("/contestMain")
-    public String contestMain(@RequestParam("contestId") Long contestId,
-                              @RequestHeader("Authorization") String token) {
-
-        String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // ????影?력??????loginId ?????댄뱼???
-Long HeIs = contestLiveService.whoAreU(contestId, tokenFromId);
-
-        if (HeIs == 0)
-            return "examiner";
-        else if (HeIs == 1)
-            return "contestant";
-        else
-            return "idk";
+    @GetMapping("/contestMain")
+    public BaseResponse<String> contestMain(
+            @RequestParam("contestId") Long contestId,
+            @AuthenticationPrincipal(expression = "username") String loginId
+    ) {
+        Long role = contestLiveService.whoAreU(contestId, loginId);
+        if (role == 0) {
+            return BaseResponse.onSuccess(SuccessStatus.OK, "examiner");
+        }
+        if (role == 1) {
+            return BaseResponse.onSuccess(SuccessStatus.OK, "contestant");
+        }
+        return BaseResponse.onSuccess(SuccessStatus.OK, "unknown");
     }
 
-    // ??????살퓢???????- ???嶺????????녾컯????욱렱嶺??
-@GetMapping("/problemList")
-    public List<ContestInfoDTO> getProblemsByContestId(@RequestParam Long contestId,
-                                                       @RequestHeader("Authorization") String token) {
+    @GetMapping("/problemList")
+    public List<ContestInfoDTO> getProblemsByContestId(
+            @RequestParam Long contestId,
+            @AuthenticationPrincipal(expression = "username") String loginId
+    ) {
         return contestLiveService.getProblemsByContestId(contestId);
     }
 
-    // ??????살퓢???????- ???嶺????????ル늉???????????ш끽維귞댆??
-@GetMapping("/problemInfo")
-    public ResponseEntity<List<Problem>> getProblemsInfo(@RequestParam Long contestId,
-                                                         @RequestHeader("Authorization") String token) {
-        List<Problem> problems = contestLiveService.getProblemsInfo(contestId);
-        return ResponseEntity.ok(problems);
+    @GetMapping("/problemInfo")
+    public List<Problem> getProblemsInfo(
+            @RequestParam Long contestId,
+            @AuthenticationPrincipal(expression = "username") String loginId
+    ) {
+        return contestLiveService.getProblemsInfo(contestId);
     }
 
-    // ??????살퓢???????- ?????怨룹??????????⑥ル럯???????⑥ロ꺘??
-@GetMapping("/contestNotice")
-    public List<ContestNotice> getContestNoticeByContestId(@RequestParam Long contestId,
-                                                           @RequestHeader("Authorization") String token) {
-
-        String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // ????影?력??????loginId ?????댄뱼???
-List<ContestNotice> notices = contestLiveService.getContestNoticeByContestId(contestId, tokenFromId);
-
+    @GetMapping("/contestNotice")
+    public List<ContestNotice> getContestNoticeByContestId(
+            @RequestParam Long contestId,
+            @AuthenticationPrincipal(expression = "username") String loginId
+    ) {
+        List<ContestNotice> notices = contestLiveService.getContestNoticeByContestId(contestId, loginId);
         return notices != null ? notices : Collections.emptyList();
     }
 
-    // ??????살퓢???????- ?????怨룹???????????留??????怨뺤른??
-@PostMapping("/contestNoticeCreate")
-    public ResponseEntity<ContestNotice> createContestNotice(@RequestBody ContestNoticeDTO contestNoticeDTO,
-                                                             @RequestHeader("Authorization") String token) {
+    @PostMapping("/contestNoticeCreate")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ContestNotice createContestNotice(
+            @RequestBody ContestNoticeDTO contestNoticeDTO,
+            @AuthenticationPrincipal(expression = "username") String loginId
+    ) {
+        Users user = getLoginUser(loginId);
+        contestNoticeDTO.setUserId(user.getId());
+        return contestLiveService.saveContestNotice(contestNoticeDTO);
+    }
 
-        String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // ????影?력??????loginId ?????댄뱼???
-Optional<Users> userOptional = userRepository.findByLoginId(tokenFromId);
-        if (userOptional.isPresent()) {
-            Users user = userOptional.get();
-            Long userId = user.getId();
-
-            contestNoticeDTO.setUserId(userId);
+    @DeleteMapping("/contestNotices/{contestId}/{contestNoticeId}")
+    public BaseResponse<Void> deleteContestNotice(
+            @PathVariable("contestId") Long contestId,
+            @PathVariable("contestNoticeId") Long contestNoticeId,
+            @AuthenticationPrincipal(expression = "username") String loginId
+    ) {
+        Long role = contestLiveService.whoAreU(contestId, loginId);
+        if (role != 0) {
+            throw new ContestException(ErrorStatus._FORBIDDEN, "대회 공지를 삭제할 권한이 없습니다.");
         }
 
-        ContestNotice savedNotice = contestLiveService.saveContestNotice(contestNoticeDTO);
-        return new ResponseEntity<>(savedNotice, HttpStatus.CREATED);
+        contestLiveService.deleteContestNotice(contestNoticeId);
+        return BaseResponse.onSuccess(SuccessStatus.OK, null);
     }
 
-    // ??????살퓢???????- ?????怨룹??????????
-@DeleteMapping("/contestNotices/{contestId}/{contestNoticeId}")
-    public ResponseEntity<String> deleteContestNotice(@PathVariable("contestId") Long contestId,
-                                                      @PathVariable("contestNoticeId") Long contestNoticeId,
-                                                      @RequestHeader("Authorization") String token) {
-
-        String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // ????影?력??????loginId ?????댄뱼???
-Long HeIs = contestLiveService.whoAreU(contestId, tokenFromId);
-
-        if (HeIs == 0) {
-            contestLiveService.deleteContestNotice(contestNoticeId);
-            return ResponseEntity.ok("Contest Notice with ID: " + contestNoticeId + " has been deleted.");
-        } else
-            return ResponseEntity.ok("??????????????깅즽????????놁졄.");
+    @GetMapping("/isChecked")
+    public Boolean isChecked(
+            @RequestParam("contestId") Long contestId,
+            @AuthenticationPrincipal(expression = "username") String loginId
+    ) {
+        Users user = getLoginUser(loginId);
+        return contestLiveService.isCheckedReturn(contestId, user.getId());
     }
 
-    // ?????饔낅떽????怨뚮옩????????isChecked ?????됰Ŧ鍮????轅붽틓????????
-@GetMapping("/isChecked")
-    public ResponseEntity<Boolean> isChecked(@RequestParam("contestId") Long contestId,
-                                             @RequestHeader("Authorization") String token) {
-
-        String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // ????影?력??????loginId ?????댄뱼???
-Long userId = userRepository.findByLoginId(tokenFromId)
-                .orElseThrow(() -> new ContestException(ErrorStatus._NOT_FOUND, "User not found with loginId: " + tokenFromId))
-                .getId();
-
-        boolean isContestantChecked = contestLiveService.isCheckedReturn(contestId, userId);
-        return ResponseEntity.ok(isContestantChecked);
-    }
-
-    // ??????살퓢???????- ???꿔꺂?????????熬곻퐢夷??
-@GetMapping("/submitList")
-    public ResponseEntity<SubmitPageDto<SubmitDTO>> getSubmitsList(@RequestParam Long contestId,
-                                                                   @RequestParam(defaultValue = "0") int page,
-                                                                   @RequestParam(defaultValue = "10") int size,
-                                                                   @RequestHeader("Authorization") String token) {
+    @GetMapping("/submitList")
+    public SubmitPageDto<SubmitDTO> getSubmitsList(
+            @RequestParam Long contestId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal(expression = "username") String loginId
+    ) {
         Pageable pageable = PageRequest.of(page, size);
-        SubmitPageDto<SubmitDTO> submitPageDto = contestLiveService.getSubmitsWithProblems(contestId, pageable);
-        return ResponseEntity.ok(submitPageDto);
+        return contestLiveService.getSubmitsWithProblems(contestId, pageable);
     }
 
-
-    // ?饔낅떽?????????彛???棺堉?뤃?????????⑥ル럯???????⑥ロ꺘??
-@GetMapping("/questionsList/{contestId}")
-    public List<ContestQuestion> getQuestionsByContestId(@PathVariable Long contestId,
-                                                          @RequestHeader("Authorization") String token) {
-
+    @GetMapping("/questionsList/{contestId}")
+    public List<ContestQuestion> getQuestionsByContestId(
+            @PathVariable Long contestId,
+            @AuthenticationPrincipal(expression = "username") String loginId
+    ) {
         Contest contest = contestService.getContestById(contestId);
         return contestLiveService.getQuestionsByContest(contest);
     }
 
-    // ?饔낅떽?????????彛???棺堉?뤃?????????????留??????怨뺤른??
-@PostMapping("/createQuestions")
-    public ResponseEntity<String> addQuestion(@RequestBody ContestQuestionDTO contestQuestionDTO,
-                                              @RequestHeader("Authorization") String token) {
-
-        String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // ????影?력??????loginId ?????댄뱼???
-Optional<Users> userOptional = userRepository.findByLoginId(tokenFromId);
-
-        if (userOptional.isPresent()) {
-            Users user = userOptional.get();
-            Long userId = user.getId();
-
-            // ?饔낅떽?????????彛??ID ???嚥싲갭큔???            contestQuestionDTO.setUserId(userId);
-
-            contestLiveService.addQuestion(contestQuestionDTO);
-
-            return new ResponseEntity<>("Question added successfully", HttpStatus.CREATED);
-        } else {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-        }
+    @PostMapping("/createQuestions")
+    @ResponseStatus(HttpStatus.CREATED)
+    public BaseResponse<Void> addQuestion(
+            @RequestBody ContestQuestionDTO contestQuestionDTO,
+            @AuthenticationPrincipal(expression = "username") String loginId
+    ) {
+        Users user = getLoginUser(loginId);
+        contestQuestionDTO.setUserId(user.getId());
+        contestLiveService.addQuestion(contestQuestionDTO);
+        return BaseResponse.onSuccess(SuccessStatus.CREATED, null);
     }
 
-    // ?饔낅떽?????????彛???棺堉?뤃??????????????留? ????????ш끽維귞댆?
-@DeleteMapping("/deleteQuestion/{questionId}")
-    public ResponseEntity<String> deleteContestQuestion(@PathVariable Long questionId,
-                                                        @RequestHeader("Authorization") String token) {
-
+    @DeleteMapping("/deleteQuestion/{questionId}")
+    public BaseResponse<Void> deleteContestQuestion(
+            @PathVariable Long questionId,
+            @AuthenticationPrincipal(expression = "username") String loginId
+    ) {
         contestLiveService.deleteContestQuestion(questionId);
-        return new ResponseEntity<>("Question delete successfully", HttpStatus.CREATED);
+        return BaseResponse.onSuccess(SuccessStatus.OK, null);
     }
 
-    // ?饔낅떽?????????彛???棺堉?뤃???????? ????
-@PostMapping("/QuestionAnswer")
-    public ResponseEntity<String> answerQuestion(@RequestBody AnswerDTO answerDTO,
-                                                 @RequestHeader("Authorization") String token) {
-
-        String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // ????影?력??????loginId ?????댄뱼???
-Optional<Users> userOptional = userRepository.findByLoginId(tokenFromId);
-
-        if (userOptional.isPresent()) {
-            Users answerer = userOptional.get();
-            Long userId = answerer.getId();
-
-            // ????????ID ???嚥싲갭큔???            answerDTO.setAnswerer(userId);
-
-            return contestLiveService.answerQuestion(answerDTO);
-        } else {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-        }
+    @PostMapping("/QuestionAnswer")
+    @ResponseStatus(HttpStatus.CREATED)
+    public BaseResponse<Void> answerQuestion(
+            @RequestBody AnswerDTO answerDTO,
+            @AuthenticationPrincipal(expression = "username") String loginId
+    ) {
+        Users answerer = getLoginUser(loginId);
+        answerDTO.setAnswerer(answerer.getId());
+        contestLiveService.answerQuestion(answerDTO);
+        return BaseResponse.onSuccess(SuccessStatus.CREATED, null);
     }
 
+    private Users getLoginUser(String loginId) {
+        return userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new ContestException(ErrorStatus._NOT_FOUND, "사용자를 찾을 수 없습니다."));
+    }
 }

@@ -1,22 +1,26 @@
 package Winter_Project.Semteul_Battle.domain.user.controller;
 
-import Winter_Project.Semteul_Battle.global.security.jwt.JwtTokenProvider;
-import Winter_Project.Semteul_Battle.domain.user.entity.Users;
 import Winter_Project.Semteul_Battle.domain.user.dto.response.UserPageDto;
+import Winter_Project.Semteul_Battle.domain.user.entity.Users;
+import Winter_Project.Semteul_Battle.domain.user.exception.UserException;
 import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
 import Winter_Project.Semteul_Battle.domain.user.service.UserPageService;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ObjectMetadata;
+import Winter_Project.Semteul_Battle.global.response.BaseResponse;
+import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
+import Winter_Project.Semteul_Battle.global.status.SuccessStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,83 +30,63 @@ public class UsersPageController {
 
     private final UserPageService userPageService;
     private final UserRepository userRepository;
-    private final JwtTokenProvider jwtTokenProvider;
 
-    @Value("#{environment['cloud.aws.s3.bucketName']}")
-    private String bucket;
-
-    // ?耀붾굝???????????곌떽釉붾?????????? ????⑥ル?????
-@GetMapping("/userPage")
-    public ResponseEntity<UserPageDto> getUserPageInfo(@RequestHeader("Authorization") String token) {
-
-        UserPageDto userPageDto = userPageService.getUserInfoWithContests(token);
-
+    @GetMapping("/userPage")
+    public UserPageDto getUserPageInfo(@AuthenticationPrincipal(expression = "username") String loginId) {
+        UserPageDto userPageDto = userPageService.getUserInfoWithContests(loginId);
         if (userPageDto == null) {
-            return ResponseEntity.notFound().build();
+            throw new UserException(ErrorStatus._NOT_FOUND, "사용자 페이지 정보를 찾을 수 없습니다.");
         }
-
-        return ResponseEntity.ok(userPageDto);
+        return userPageDto;
     }
 
-    // ??????????? ????????
-@PutMapping("/showContests")
-    public ResponseEntity<String> setShowContestsVisibility(
-            @RequestHeader("Authorization") String token,
-            @RequestParam(value = "visible", defaultValue = "true") boolean visible) {
-        userPageService.setShowContestsVisibility(token, visible);
-        return ResponseEntity.ok("???????????????곕툠???????????μ떜媛?걫?????????곕츥????汝뷴젆?琉????냐???????????????곸죩.");
+    @PutMapping("/showContests")
+    public BaseResponse<Void> setShowContestsVisibility(
+            @AuthenticationPrincipal(expression = "username") String loginId,
+            @RequestParam(value = "visible", defaultValue = "true") boolean visible
+    ) {
+        userPageService.setShowContestsVisibility(loginId, visible);
+        return BaseResponse.onSuccess(SuccessStatus.OK, null);
     }
 
-    // ?????獄쏅챶留??貫?????????耀붾굝????? ????????癲ル슢???㏓뙀?
-@PostMapping("/userPic")
-    public ResponseEntity<String> setShowContestsVisibility(@RequestHeader("Authorization") String token,
-                                                            @RequestParam("file") MultipartFile file) {
-        String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // ????壤굿??Β??????loginId ??????꾨굴???
-Optional<Users> userOptional = userRepository.findByLoginId(tokenFromId);
+    @PostMapping("/userPic")
+    public BaseResponse<String> uploadUserProfilePic(
+            @AuthenticationPrincipal(expression = "username") String loginId,
+            @RequestParam("file") MultipartFile file
+    ) {
+        Users user = getLoginUser(loginId);
+        try {
+            String fileUrl = userPageService.uploadUserProfilePic(file);
+            user.saveProfileUrl(fileUrl);
+            userRepository.save(user);
+            return BaseResponse.onSuccess(SuccessStatus.OK, fileUrl);
+        } catch (IOException e) {
+            throw new UserException(ErrorStatus._INTERNAL_SERVER_ERROR, "프로필 이미지 업로드에 실패했습니다.");
+        }
+    }
 
-        if (userOptional.isPresent()) {
-            try {
-                String fileUrl = userPageService.uploadUserProfilePic(file);
-                Users user = userOptional.get();
-                user.saveProfileUrl(fileUrl); // Users ?????????????????饔낅떽???????????耀붾굝????????? ??饔낅떽????????轅붽틓???????????獄쏅챶留??貫????URL ????                userRepository.save(user); // ?????곕츥????汝뷴젆?琉?????筌???? ????????? ???????嚥〓끃異??????????곸죩.
-return ResponseEntity.ok(fileUrl + " : ?????獄쏅챶留??貫?????????耀붾굝????? ????μ떜媛?걫?????????獄쏅챶留???????????");
-            } catch (IOException e) {
-                e.printStackTrace();
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    @PatchMapping("/userPicEdit")
+    public BaseResponse<String> updateUserProfilePic(
+            @AuthenticationPrincipal(expression = "username") String loginId,
+            @RequestParam("file") MultipartFile file
+    ) {
+        Users user = getLoginUser(loginId);
+        try {
+            if (user.getProfile() != null && !user.getProfile().isEmpty()) {
+                userPageService.deleteUserProfilePic(user.getProfile());
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("?????? ?耀붾굝????????????????源낆┰?????????곸죩.");
+
+            String fileUrl = userPageService.uploadUserProfilePic(file);
+            user.setProfile(fileUrl);
+            userRepository.save(user);
+            return BaseResponse.onSuccess(SuccessStatus.OK, fileUrl);
+        } catch (IOException e) {
+            throw new UserException(ErrorStatus._INTERNAL_SERVER_ERROR, "프로필 이미지 수정에 실패했습니다.");
         }
     }
 
-    // ?????獄쏅챶留??貫?????????耀붾굝????? ?????곌떽釉붾??
-@PutMapping("/userPicEdit")
-    public ResponseEntity<String> updateUserProfilePic(@RequestHeader("Authorization") String token,
-                                                       @RequestParam("file") MultipartFile file) {
-
-        String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // ????壤굿??Β??????loginId ??????꾨굴???
-Optional<Users> userOptional = userRepository.findByLoginId(tokenFromId);
-
-        if (userOptional.isPresent()) {
-            try {
-                Users user = userOptional.get();
-                // ?????????????獄쏅챶留??貫????????????
-if (user.getProfile() != null && !user.getProfile().isEmpty()) {
-                    userPageService.deleteUserProfilePic(user.getProfile());
-                }
-
-                String fileUrl = userPageService.uploadUserProfilePic(file);
-                user.setProfile(fileUrl);
-                userRepository.save(user);
-
-                return ResponseEntity.ok(fileUrl + " : ?????獄쏅챶留??貫?????????耀붾굝??????????ル뒌?? ????????댁댉??????諛몃마????????????");
-            } catch (IOException e) {
-                e.printStackTrace();
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("profile upload failed");
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("?????? ?耀붾굝????????????????源낆┰?????????곸죩.");
-        }
+    private Users getLoginUser(String loginId) {
+        return userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new UserException(ErrorStatus._NOT_FOUND, "사용자를 찾을 수 없습니다."));
     }
-
 }
