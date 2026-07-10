@@ -4,6 +4,8 @@
 *.env
 .env.*
 *.properties
+!docker-compose.yml
+!docker-compose.yaml
 !gradle-wrapper.properties
 
 # Secrets / credentials

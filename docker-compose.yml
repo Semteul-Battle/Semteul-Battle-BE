@@ -1,0 +1,35 @@
+services:
+  semteul-postgres:
+    image: postgres:17
+    container_name: semteul-postgres
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${DB_NAME:-semteul_battle}
+      POSTGRES_USER: ${DB_USERNAME:-semteul}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-semteul}
+    volumes:
+      - semteul-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  semteul-redis:
+    image: redis:7.4-alpine
+    container_name: semteul-battle-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - semteul-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  semteul-postgres-data:
+  semteul-redis-data:
