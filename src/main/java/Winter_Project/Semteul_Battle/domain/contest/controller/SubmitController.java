@@ -1,7 +1,7 @@
 package Winter_Project.Semteul_Battle.domain.contest.controller;
 
 import Winter_Project.Semteul_Battle.global.security.jwt.JwtTokenProvider;
-import Winter_Project.Semteul_Battle.domain.contest.dto.SubmitDTO;
+import Winter_Project.Semteul_Battle.domain.contest.dto.request.SubmitDTO;
 import Winter_Project.Semteul_Battle.domain.contest.service.ContestLiveService;
 import Winter_Project.Semteul_Battle.domain.contest.service.SubmitService;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package Winter_Project.Semteul_Battle.domain.problem.controller;
 
 import Winter_Project.Semteul_Battle.global.security.jwt.JwtTokenProvider;
-import Winter_Project.Semteul_Battle.domain.problem.dto.*;
+import Winter_Project.Semteul_Battle.domain.problem.dto.request.*;
 import Winter_Project.Semteul_Battle.domain.contest.repository.ContestRepository;
 import Winter_Project.Semteul_Battle.domain.problem.repository.IORepository;
 import Winter_Project.Semteul_Battle.domain.problem.repository.ProblemRepository;

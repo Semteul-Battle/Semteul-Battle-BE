@@ -2,7 +2,7 @@
 
 package Winter_Project.Semteul_Battle.domain.contest.controller;
 
-import Winter_Project.Semteul_Battle.domain.contest.dto.ContestApplicationDto;
+import Winter_Project.Semteul_Battle.domain.contest.dto.request.ContestApplicationDto;
 import Winter_Project.Semteul_Battle.domain.contest.service.ContestApplicationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

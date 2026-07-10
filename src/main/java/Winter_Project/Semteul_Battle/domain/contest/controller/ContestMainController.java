@@ -1,11 +1,16 @@
 package Winter_Project.Semteul_Battle.domain.contest.controller;
 
+
+
+import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
+import Winter_Project.Semteul_Battle.domain.contest.exception.ContestException;
 import Winter_Project.Semteul_Battle.global.security.jwt.JwtTokenProvider;
 import Winter_Project.Semteul_Battle.domain.contest.entity.*;
 import Winter_Project.Semteul_Battle.domain.problem.entity.*;
 import Winter_Project.Semteul_Battle.domain.user.entity.*;
 import Winter_Project.Semteul_Battle.domain.menu.entity.*;
-import Winter_Project.Semteul_Battle.domain.contest.dto.*;
+import Winter_Project.Semteul_Battle.domain.contest.dto.request.*;
+import Winter_Project.Semteul_Battle.domain.contest.dto.response.*;
 import Winter_Project.Semteul_Battle.domain.contest.repository.*;
 import Winter_Project.Semteul_Battle.domain.problem.repository.*;
 import Winter_Project.Semteul_Battle.domain.user.repository.*;
@@ -119,7 +124,7 @@ Long HeIs = contestLiveService.whoAreU(contestId, tokenFromId);
 
         String tokenFromId = jwtTokenProvider.extractLoginIdFromToken(token); // ????影?력??????loginId ?????댄뱼???
 Long userId = userRepository.findByLoginId(tokenFromId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with loginId: " + tokenFromId))
+                .orElseThrow(() -> new ContestException(ErrorStatus._NOT_FOUND, "User not found with loginId: " + tokenFromId))
                 .getId();
 
         boolean isContestantChecked = contestLiveService.isCheckedReturn(contestId, userId);

@@ -1,13 +1,17 @@
 package Winter_Project.Semteul_Battle.domain.menu.controller;
 
+
+
+import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
+import Winter_Project.Semteul_Battle.domain.menu.exception.MenuException;
 import Winter_Project.Semteul_Battle.global.security.jwt.JwtTokenProvider;
 import Winter_Project.Semteul_Battle.domain.menu.entity.MenuComment;
 import Winter_Project.Semteul_Battle.domain.menu.entity.MenuQuestion;
 import Winter_Project.Semteul_Battle.domain.user.entity.Users;
-import Winter_Project.Semteul_Battle.domain.menu.dto.comment.CommentCheckDto;
-import Winter_Project.Semteul_Battle.domain.menu.dto.comment.CommentDeleteDto;
-import Winter_Project.Semteul_Battle.domain.menu.dto.comment.CommentDto;
-import Winter_Project.Semteul_Battle.domain.menu.dto.comment.CommentUpdateDto;
+import Winter_Project.Semteul_Battle.domain.menu.dto.response.CommentCheckDto;
+import Winter_Project.Semteul_Battle.domain.menu.dto.request.CommentDeleteDto;
+import Winter_Project.Semteul_Battle.domain.menu.dto.request.CommentDto;
+import Winter_Project.Semteul_Battle.domain.menu.dto.request.CommentUpdateDto;
 import Winter_Project.Semteul_Battle.domain.menu.repository.MenuQuestionRepository;
 import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
 import Winter_Project.Semteul_Battle.domain.menu.service.CommentService;
@@ -17,8 +21,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -62,7 +64,7 @@ Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             List<MenuComment> comments = commentService.getCommentsFromQuestion(commentCheckDto.getQuestionId());
             return ResponseEntity.ok(comments);
         } catch (EmptyResultDataAccessException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "??????饔낅떽?????????彛????????????饔낅떽???????????????깅즽????????놁졄.", e);
+            throw new MenuException(ErrorStatus._NOT_FOUND, "??????饔낅떽?????????彛????????????饔낅떽???????????????깅즽????????놁졄.");
         }
     }
 

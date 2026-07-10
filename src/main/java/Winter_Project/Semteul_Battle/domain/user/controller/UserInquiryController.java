@@ -1,6 +1,6 @@
 package Winter_Project.Semteul_Battle.domain.user.controller;
 
-import Winter_Project.Semteul_Battle.domain.user.dto.UserInquiryDto;
+import Winter_Project.Semteul_Battle.domain.user.dto.response.UserInquiryDto;
 import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
 import Winter_Project.Semteul_Battle.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
