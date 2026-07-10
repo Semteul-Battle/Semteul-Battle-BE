@@ -16,7 +16,7 @@ import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-@RestControllerAdvice(basePackages = "Winter_Project.Semteul_Battle.controller")
+@RestControllerAdvice(basePackages = "Winter_Project.Semteul_Battle.domain")
 @RequiredArgsConstructor
 public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
     private final ObjectMapper objectMapper;
@@ -45,7 +45,7 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
                 response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
                 return objectMapper.writeValueAsString(wrapped);
             } catch (JsonProcessingException e) {
-                throw new IllegalStateException("API 응답 직렬화에 실패했습니다.", e);
+                throw new IllegalStateException("API ????????轅붽틓????????거????????怨뚯댅???????????낆젵.", e);
             }
         }
         return wrapped;

@@ -7,9 +7,9 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum SuccessStatus implements BaseCode {
-    OK(HttpStatus.OK, "COMMON_200", "성공입니다."),
-    CREATED(HttpStatus.CREATED, "COMMON_201", "생성되었습니다."),
-    NO_CONTENT(HttpStatus.NO_CONTENT, "COMMON_204", "처리되었습니다.");
+    OK(HttpStatus.OK, "COMMON_200", "??μ떜媛?슙?癰귥쥙???????뽯쨦??"),
+    CREATED(HttpStatus.CREATED, "COMMON_201", "???袁⑸즴????癲???????"),
+    NO_CONTENT(HttpStatus.NO_CONTENT, "COMMON_204", "?轅붽틓??影?뽧걤???癲???????");
 
     private final HttpStatus httpStatus;
     private final String code;

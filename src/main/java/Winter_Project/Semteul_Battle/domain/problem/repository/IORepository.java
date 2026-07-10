@@ -1,0 +1,14 @@
+package Winter_Project.Semteul_Battle.domain.problem.repository;
+
+import Winter_Project.Semteul_Battle.domain.problem.entity.IO;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface IORepository extends JpaRepository<IO, Long> {
+    Optional<IO> findById(Long IOId);
+    void deleteByProblem_Id(Long problemId);
+
+}
