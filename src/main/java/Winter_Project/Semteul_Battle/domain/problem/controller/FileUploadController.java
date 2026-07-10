@@ -1,13 +1,19 @@
 package Winter_Project.Semteul_Battle.domain.problem.controller;
 
+
+import Winter_Project.Semteul_Battle.global.response.BaseResponse;
+import Winter_Project.Semteul_Battle.global.status.SuccessStatus;
+import Winter_Project.Semteul_Battle.domain.problem.exception.ProblemException;
+import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -24,7 +30,7 @@ public class FileUploadController {
     private String bucket;
 
     @PostMapping
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+    public BaseResponse<String> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
             String fileName = file.getOriginalFilename();
             String fileUrl = "https://" + bucket + ".s3.amazonaws.com/test/" + fileName;
@@ -33,12 +39,10 @@ public class FileUploadController {
             metadata.setContentType(file.getContentType());
             metadata.setContentLength(file.getSize());
 
-            // ?????bucket ?????곕츥????? ??饔낅떽?????????쇰뮝????耀붾굝???????饔낅떽????????勇??????밸쫫??????萸??
             amazonS3Client.putObject(bucket, "test/" + fileName, file.getInputStream(), metadata);
-return ResponseEntity.ok(fileUrl);
+            return BaseResponse.onSuccess(SuccessStatus.OK, fileUrl);
         } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ProblemException(ErrorStatus._INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
         }
     }
 }

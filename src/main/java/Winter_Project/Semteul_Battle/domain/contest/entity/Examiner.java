@@ -20,12 +20,12 @@ public class Examiner {
     @Column(updatable = false, unique = true, nullable = false)
     private Long id;
 
-    // ??? ?????????
+
     @ManyToOne
     @JoinColumn(name = "users_id", nullable = false)
     private Users users;
 
-    // ?????????????
+
     @ManyToOne
     @JoinColumn(name = "contest_id", nullable = false)
     private Contest contest;

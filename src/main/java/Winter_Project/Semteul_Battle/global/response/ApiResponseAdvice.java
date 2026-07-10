@@ -45,7 +45,7 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
                 response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
                 return objectMapper.writeValueAsString(wrapped);
             } catch (JsonProcessingException e) {
-                throw new IllegalStateException("API ????????轅붽틓????????거????????怨뚯댅???????????낆젵.", e);
+                throw new IllegalStateException("API 응답을 JSON으로 변환하지 못했습니다.", e);
             }
         }
         return wrapped;

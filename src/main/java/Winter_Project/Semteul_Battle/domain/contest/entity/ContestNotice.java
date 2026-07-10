@@ -35,13 +35,13 @@ public class ContestNotice {
     @Column(nullable = false)
     private Timestamp time;
 
-    // ?????????????
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "contest_id", nullable = false)
     private Contest contest;
 
-    // ??? ?????????
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "users_id", nullable = false)

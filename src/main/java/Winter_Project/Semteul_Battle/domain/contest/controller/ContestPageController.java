@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class ContestPageController {
     private final ContestPageService contestPageService;
 
-    // ?饔낅떽????ш낄?뉔뇡????????饔낅떽????ш낄?뉔뇡?꾩땡沃섏쥓??????怨쀫뮡????
+
 @GetMapping("/all")
     public ContestPageDto getTotalContests(
             @RequestParam(defaultValue = "0", value = "page") int page,
@@ -39,7 +39,7 @@ public class ContestPageController {
         return contestPageService.buildDTO(contestPage, examinerIds);
     }
 
-    // ?饔낅떽?????嶺뚮ㅎ????????????????饔낅떽????ш낄?뉔뇡?꾩땡沃섏쥓??????怨쀫뮡????
+
 @GetMapping("/ongoing")
     public ContestPageDto getOngoingContests(
             @RequestParam(defaultValue = "0") int page,
@@ -53,7 +53,7 @@ public class ContestPageController {
         return contestPageService.buildDTO(contestPage, examinerIds);
     }
 
-    // ???嚥싲갭큔?????????饔낅떽????ш낄?뉔뇡?꾩땡沃섏쥓??????怨쀫뮡????
+
 @GetMapping("/scheduled")
     public ContestPageDto getScheduledContests(
             @RequestParam(defaultValue = "0") int page,
@@ -67,7 +67,7 @@ public class ContestPageController {
         return contestPageService.buildDTO(contestPage, examinerIds);
     }
 
-    // ??????닿틢????????饔낅떽????ш낄?뉔뇡?꾩땡沃섏쥓??????怨쀫뮡????
+
 @GetMapping("/finished")
     public ContestPageDto getFinishedContests(
             @RequestParam(defaultValue = "0") int page,

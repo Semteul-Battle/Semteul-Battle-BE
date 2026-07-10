@@ -1,95 +1,84 @@
 package Winter_Project.Semteul_Battle.domain.user.controller;
 
-import Winter_Project.Semteul_Battle.global.security.jwt.JwtTokenProvider;
-import Winter_Project.Semteul_Battle.global.security.dto.JwtToken;
 import Winter_Project.Semteul_Battle.domain.user.dto.request.SignInDto;
-import Winter_Project.Semteul_Battle.domain.user.dto.request.SignOutDto;
+import Winter_Project.Semteul_Battle.domain.user.exception.UserException;
 import Winter_Project.Semteul_Battle.domain.user.service.CustomUserDetailsService;
 import Winter_Project.Semteul_Battle.domain.user.service.UserService;
+import Winter_Project.Semteul_Battle.global.security.dto.JwtToken;
+import Winter_Project.Semteul_Battle.global.security.jwt.JwtTokenProvider;
+import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
 import Winter_Project.Semteul_Battle.global.util.RedisUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class SignInOutController {
+
     private final CustomUserDetailsService customUserDetailsService;
     private final UserService userService;
     private final RedisUtil redisUtil;
     private final JwtTokenProvider jwtTokenProvider;
-    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    // ?癲??嶺???
-@PostMapping("/sign-in")
-    public ResponseEntity<String> signIn(@RequestBody SignInDto signInDto, HttpServletResponse response) {
+    @PostMapping("/sign-in")
+    public JwtToken signIn(@RequestBody SignInDto signInDto, HttpServletResponse response) {
         String loginId = signInDto.getLoginId();
         String password = signInDto.getPassword();
 
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(loginId);
-
-        // ????⑤슢堉??곕????password????ル늉?? ?????얜궙??뺣뙀?洹?㎦???????깅즽癲?? password?? ???μ떜媛?걫??녿펾筌???汝뷴젆??녷뉩??읂?γ볥덆???? ??轅붽틓??????????꿔꺂??????
-if (encoder.matches(password, userDetails.getPassword())) {
-            // Passwords match, JWT ????影?력??????熬곣뫖利??????濡ろ뜐???????썹땟戮녹??????꿔꺂??????
-JwtToken jwtToken = userService.signIn(loginId, password);
-            log.info("login requested: {}", loginId);
-            log.info("JWT ????影?력??accessToken = {}, refreshToken = {}", jwtToken.getAccessToken(), jwtToken.getRefreshToken());
-            redisUtil.setDataExpire(loginId, jwtToken.getRefreshToken(), 86400000);
-
-            return ResponseEntity.ok("?癲??嶺?????關?쒎첎????곌램伊??n"+"AccessToken : "+jwtToken.getAccessToken()+"\n"+"RefreshToken : "+jwtToken.getRefreshToken());
-        } else {
-            // Passwords do not match, ?癲??嶺?????????⑤슣???饔낅떽???壤굿?戮㏐광??            log.warn("?????'{}'???癲??嶺?????????⑤슣??, loginId);
-return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("?????諛몃마??維◈??????? ???녾낮?녔틦?몄???????硫몄꺏癲?????쎛 ??????? ????????????놁졄.");
+        if (!encoder.matches(password, userDetails.getPassword())) {
+            log.warn("login failed: {}", loginId);
+            throw new UserException(ErrorStatus._UNAUTHORIZED, "아이디 또는 비밀번호가 올바르지 않습니다.");
         }
+
+        JwtToken jwtToken = userService.signIn(loginId, password);
+        log.info("login requested: {}", loginId);
+        redisUtil.setDataExpire(loginId, jwtToken.getRefreshToken(), 86400000);
+        return jwtToken;
     }
 
-    // ?癲??嶺??????諛몃마??    // loginId ?????⑹름????????諛몃마??
-@PostMapping("/sign-out")
-    public boolean signOut(@RequestBody SignOutDto signOutDto, @RequestHeader("Authorization") String token) {
-        if (token != null && token.startsWith("Bearer ")) {
-            String accessToken = token.substring(7); // "Bearer " ???嚥싲갭큔?????????뼿?????⑥ル츧癲??accessToken
-
-            // redisDB???????얜궙??뺣뙀?洹?㎦?????녾컯?????????살퓢??????影?력???????            redisUtil.deleteData(signOutDto.getLoginId());
-
-            // AccessToken?????????⑤슦???곌떽?댁젢????轅붽틓??????????댄뱼?????꿔꺂???????饔낅떽?????傭??????留왖??
-Long expiration = jwtTokenProvider.getExpiration(accessToken);
-            redisUtil.setBlackList(accessToken, "access_token", expiration);
-
-            // ?癲??嶺??????諛몃마???????諛몃마???SecurityContext????????????밸븶???ルㅏ萸?類?????????꿔꺂??????
-            SecurityContextHolder.clearContext();
-            return true;
+    @PostMapping("/sign-out")
+    public boolean signOut(
+            @AuthenticationPrincipal(expression = "username") String loginId,
+            @RequestHeader("Authorization") String token
+    ) {
+        if (token == null || !token.startsWith("Bearer ")) {
+            throw new UserException(ErrorStatus._UNAUTHORIZED, "유효하지 않은 인증 토큰입니다.");
         }
-        return false;
+
+        String accessToken = token.substring(7);
+        redisUtil.deleteData(loginId);
+
+        Long expiration = jwtTokenProvider.getExpiration(accessToken);
+        redisUtil.setBlackList(accessToken, "access_token", expiration);
+
+        SecurityContextHolder.clearContext();
+        return true;
     }
 
-    // accessToken ????????????嫄???
-@PostMapping("/renewalToken")
-    public ResponseEntity<String> renewalToken(@RequestParam String loginId) {
-
-        // redis???????????얠??????????refreshToken???????댄뱼????
-String refreshTokenFromId = redisUtil.getData(loginId);
-
-        // refreshToken???????????關?쒎첎?嫄?濚밸쮦????饔낅떽????????????濡ろ뜐??? ???怨쀫뮡?????????뗫젛癲ル슣???鶯??饔낅떽???????????꿔꺂????????棺堉?뤃????
-if (refreshTokenFromId != null) {
-            if (jwtTokenProvider.validateToken(refreshTokenFromId)) {
-                JwtToken newToken = userService.tokenRenewal(loginId);
-                return ResponseEntity.ok("????影?력?????轅붽틓???????곷뼱??????ㅻ쑋?꿔꺂??琉뷩궘??????썹땟戮녹??醫딆맚???????????"+"\n"+
-                        "AccessToken : "+newToken.getAccessToken()+"\n"+"RefreshToken : "+newToken.getRefreshToken());
-            } else {
-                return ResponseEntity.badRequest().body("????影?력????饔낅떽?????傭??????????");
-            }
-        } else {
-            return ResponseEntity.badRequest().body("????影?력??????怨쀫뮡?????? ????????????놁졄.");
+    @PostMapping("/renewalToken")
+    public JwtToken renewalToken(@RequestParam String loginId) {
+        String refreshTokenFromId = redisUtil.getData(loginId);
+        if (refreshTokenFromId == null) {
+            throw new UserException(ErrorStatus._BAD_REQUEST, "저장된 refresh token이 없습니다.");
         }
+        if (!jwtTokenProvider.validateToken(refreshTokenFromId)) {
+            throw new UserException(ErrorStatus._UNAUTHORIZED, "refresh token이 유효하지 않습니다.");
+        }
+        return userService.tokenRenewal(loginId);
     }
 }

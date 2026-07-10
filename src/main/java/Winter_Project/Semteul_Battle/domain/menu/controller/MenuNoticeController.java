@@ -1,90 +1,90 @@
 package Winter_Project.Semteul_Battle.domain.menu.controller;
 
-import Winter_Project.Semteul_Battle.global.security.jwt.JwtTokenProvider;
-import Winter_Project.Semteul_Battle.domain.user.entity.Users;
 import Winter_Project.Semteul_Battle.domain.menu.dto.request.NoticeDeleteDto;
 import Winter_Project.Semteul_Battle.domain.menu.dto.request.NoticeDto;
-import Winter_Project.Semteul_Battle.domain.menu.dto.response.NoticePageDto;
 import Winter_Project.Semteul_Battle.domain.menu.dto.request.NoticeUpdateDto;
-import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
+import Winter_Project.Semteul_Battle.domain.menu.dto.response.NoticePageDto;
+import Winter_Project.Semteul_Battle.domain.menu.exception.MenuException;
 import Winter_Project.Semteul_Battle.domain.menu.service.NoticeService;
+import Winter_Project.Semteul_Battle.domain.user.entity.Users;
+import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
+import Winter_Project.Semteul_Battle.global.response.BaseResponse;
+import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
+import Winter_Project.Semteul_Battle.global.status.SuccessStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Timestamp;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/menu")
 public class MenuNoticeController {
+
     private final NoticeService noticeService;
-    private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
 
-    // ?????怨룹?????????熬곣뫖利???
-@PostMapping("/createNotice")
-    public ResponseEntity<String> createNotice(@RequestBody NoticeDto noticeDto,
-                                               @RequestHeader("Authorization") String token) {
-        String loginId = jwtTokenProvider.extractLoginIdFromToken(token);
-        Optional<Users> optionalUsers = userRepository.findByLoginId(loginId);
-
-        if(optionalUsers.isPresent()) {
-            Users users = optionalUsers.get();
-            // ?????諛몃마????????????熬곣뫖利???????????????????嚥싲갭큔???
-Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-            noticeDto.setTime(currentTime);
-
-            noticeService.createNotice(noticeDto, users);
-            return ResponseEntity.status(HttpStatus.CREATED).body("?????怨룹??????????熬곣뫖利????????????");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("?????? ?饔낅떽???????????????깅즽????????놁졄.");
-        }
+    @PostMapping("/createNotice")
+    @ResponseStatus(HttpStatus.CREATED)
+    public BaseResponse<Void> createNotice(
+            @RequestBody NoticeDto noticeDto,
+            @AuthenticationPrincipal(expression = "username") String loginId
+    ) {
+        Users users = getLoginUser(loginId);
+        noticeDto.setTime(new Timestamp(System.currentTimeMillis()));
+        noticeService.createNotice(noticeDto, users);
+        return BaseResponse.onSuccess(SuccessStatus.CREATED, null);
     }
 
-
-    // ?????怨룹?????????怨쀫뮡????
-@GetMapping("/inquiryNotice")
-    public ResponseEntity<NoticePageDto> getNotices(
+    @GetMapping("/inquiryNotice")
+    public NoticePageDto getNotices(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        NoticePageDto noticePageDto = noticeService.getNoticePage(page, size);
-        return ResponseEntity.status(HttpStatus.OK).body(noticePageDto);
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return noticeService.getNoticePage(page, size);
     }
 
-    // ?????怨룹??????????癰궽블뀯??
-@PatchMapping("/updateNotice")
-    public ResponseEntity<String> updateNotice(@RequestBody NoticeUpdateDto noticeUpdateDto,
-                                               @RequestHeader("Authorization") String token) {
-        String loginId = jwtTokenProvider.extractLoginIdFromToken(token);
-        Optional<Users> optionalUsers = userRepository.findByLoginId(loginId);
-
-        if (optionalUsers.isPresent()) {
-            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-            noticeUpdateDto.setTime(currentTime);
-            noticeService.updateNotice(noticeUpdateDto, loginId);
-            return ResponseEntity.status(HttpStatus.CREATED).body("?????怨룹???????????癰궽블뀯???????????");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("?????? ?饔낅떽???????????????깅즽????????놁졄.");
-        }
+    @PatchMapping("/updateNotice")
+    public BaseResponse<Void> updateNotice(
+            @RequestBody NoticeUpdateDto noticeUpdateDto,
+            @AuthenticationPrincipal(expression = "username") String loginId
+    ) {
+        ensureLoginUser(loginId);
+        noticeUpdateDto.setTime(new Timestamp(System.currentTimeMillis()));
+        noticeService.updateNotice(noticeUpdateDto, loginId);
+        return BaseResponse.onSuccess(SuccessStatus.OK, null);
     }
 
-    // ?????怨룹??????????
-@DeleteMapping("/deleteNotice")
-    public ResponseEntity<String> deleteNotice(@RequestBody NoticeDeleteDto noticeDeleteDto,
-                                               @RequestHeader("Authorization") String token) {
-        String loginId = jwtTokenProvider.extractLoginIdFromToken(token);
-        Optional<Users> optionalUsers = userRepository.findByLoginId(loginId);
+    @DeleteMapping("/deleteNotice")
+    public BaseResponse<Void> deleteNotice(
+            @RequestBody NoticeDeleteDto noticeDeleteDto,
+            @AuthenticationPrincipal(expression = "username") String loginId
+    ) {
+        ensureLoginUser(loginId);
+        noticeService.deleteNotice(noticeDeleteDto, loginId);
+        return BaseResponse.onSuccess(SuccessStatus.OK, null);
+    }
 
-        if (optionalUsers.isPresent()) {
-            noticeService.deleteNotice(noticeDeleteDto,loginId);
-            return ResponseEntity.status(HttpStatus.CREATED).body("?????怨룹????????????????????");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("?????? ?饔낅떽???????????????깅즽????????놁졄.");
+    private Users getLoginUser(String loginId) {
+        return userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new MenuException(ErrorStatus._NOT_FOUND, "사용자를 찾을 수 없습니다."));
+    }
+
+    private void ensureLoginUser(String loginId) {
+        if (!userRepository.existsByLoginId(loginId)) {
+            throw new MenuException(ErrorStatus._NOT_FOUND, "사용자를 찾을 수 없습니다.");
         }
     }
 }
