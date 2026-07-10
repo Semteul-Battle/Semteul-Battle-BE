@@ -1,6 +1,8 @@
 package Winter_Project.Semteul_Battle.config.jwt;
 
-import Winter_Project.Semteul_Battle.config.jwt.JwtTokenProvider;
+import Winter_Project.Semteul_Battle.global.response.BaseResponse;
+import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -8,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,32 +22,27 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends GenericFilterBean {
     private final JwtTokenProvider jwtTokenProvider;
+    private final ObjectMapper objectMapper;
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-                         FilterChain chain) throws IOException, ServletException {
-        // 1. Request Header에서 JWT 토큰 추출
+    public void doFilter(
+            ServletRequest request,
+            ServletResponse response,
+            FilterChain chain
+    ) throws IOException, ServletException {
         String token = resolveToken((HttpServletRequest) request);
 
-        // 2. validateToken으로 토큰 유효성 검사
         if (token != null) {
             try {
                 if (jwtTokenProvider.validateToken(token)) {
-                    // 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext에 저장
                     Authentication authentication = jwtTokenProvider.getAuthentication(token);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (ExpiredJwtException ex) {
-                // 만료된 토큰 처리
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().write("{ \"error\": \"Unauthorized\", \"message\": \"Expired JWT token\" }");
+                writeUnauthorizedResponse((HttpServletResponse) response, "Expired JWT token");
                 return;
             } catch (JwtException | IllegalArgumentException ex) {
-                // 올바르지 않은 토큰 처리
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().write("{ \"error\": \"Unauthorized\", \"message\": \"Invalid JWT token\" }");
+                writeUnauthorizedResponse((HttpServletResponse) response, "Invalid JWT token");
                 return;
             }
         }
@@ -52,12 +50,20 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         chain.doFilter(request, response);
     }
 
-    // Request Header에서 토큰 정보 추출
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")) {
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
         return null;
+    }
+
+    private void writeUnauthorizedResponse(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+        objectMapper.writeValue(
+                response.getOutputStream(),
+                BaseResponse.onFailure(ErrorStatus._UNAUTHORIZED, message)
+        );
     }
 }

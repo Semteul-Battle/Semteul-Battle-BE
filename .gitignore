@@ -1,1 +1,37 @@
+# Sensitive configuration
 *.yml
+*.yaml
+*.env
+.env.*
+*.properties
+!gradle-wrapper.properties
+
+# Secrets / credentials
+*.pem
+*.key
+*.p12
+*.jks
+*secret*
+*credential*
+
+# Build output
+build/
+.gradle/
+out/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+.tmp/
+tmp/

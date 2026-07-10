@@ -1,25 +1,33 @@
 package Winter_Project.Semteul_Battle.config.jwt;
 
+import Winter_Project.Semteul_Battle.global.response.BaseResponse;
+import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
-import java.io.Serializable;
 
 @Component
-public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint, Serializable {
-
-    private static final long serialVersionUID = -7858869558953243875L;
+@RequiredArgsConstructor
+public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+    private final ObjectMapper objectMapper;
 
     @Override
-    public void commence(HttpServletRequest request,
-                         HttpServletResponse response,
-                         AuthenticationException authException) throws IOException {
-        // 401 Unauthorized 에러와 함께 JSON 응답을 보냅니다.
-        response.setContentType("application/json");
+    public void commence(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AuthenticationException authException
+    ) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getOutputStream().println("{ \"error\": \"Unauthorized\", \"message\": \"" + authException.getMessage() + "\" }");
+        response.setContentType("application/json;charset=UTF-8");
+        objectMapper.writeValue(
+                response.getOutputStream(),
+                BaseResponse.onFailure(ErrorStatus._UNAUTHORIZED, authException.getMessage())
+        );
     }
 }

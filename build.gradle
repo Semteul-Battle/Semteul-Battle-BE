@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.2.2'
+	id 'org.springframework.boot' version '4.1.0'
 	id 'io.spring.dependency-management' version '1.1.4'
 }
 
@@ -8,7 +8,9 @@ group = 'Winter_Project'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	sourceCompatibility = '17'
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
 }
 
 configurations {
@@ -38,6 +40,9 @@ dependencies {
 
 	// Mail
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	// Swagger / OpenAPI
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0'
 
 	// S3
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
