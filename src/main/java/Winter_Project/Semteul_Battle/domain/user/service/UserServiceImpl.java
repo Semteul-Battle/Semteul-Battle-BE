@@ -5,6 +5,7 @@ package Winter_Project.Semteul_Battle.domain.user.service;
 import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
 import Winter_Project.Semteul_Battle.domain.user.exception.UserException;
 import Winter_Project.Semteul_Battle.global.security.jwt.JwtTokenProvider;
+import Winter_Project.Semteul_Battle.domain.user.entity.UserRole;
 import Winter_Project.Semteul_Battle.domain.user.entity.Users;
 import Winter_Project.Semteul_Battle.global.security.dto.JwtToken;
 import Winter_Project.Semteul_Battle.domain.user.dto.request.SignUpDto;
@@ -44,8 +45,10 @@ public class UserServiceImpl implements UserService {
 
 String encodedPassword = bCryptPasswordEncoder.encode(signUpDto.getPassword());
         List<String> roles = new ArrayList<>();
-        roles.add("USER");
-return UserDto.toDto(userRepository.save(signUpDto.toEntity(encodedPassword, roles)));
+        roles.add(UserRole.USER.name());
+        Users user = signUpDto.toEntity(encodedPassword);
+        user.getRoles().addAll(roles);
+        return UserDto.toDto(userRepository.save(user));
     }
 
     @Transactional

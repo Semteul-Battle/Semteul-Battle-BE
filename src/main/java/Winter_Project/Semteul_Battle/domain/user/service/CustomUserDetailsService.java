@@ -2,8 +2,10 @@ package Winter_Project.Semteul_Battle.domain.user.service;
 
 
 import Winter_Project.Semteul_Battle.domain.user.entity.Users;
+import Winter_Project.Semteul_Battle.domain.user.entity.UserRole;
 import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -32,6 +34,13 @@ if (!encodedPassword.startsWith("$2a$")) {
             encodedPassword = passwordEncoder.encode(users.getPassword());
         }
 
-        return User.builder().username(users.getLoginId()).password(encodedPassword).roles(users.getRoles().toArray(new String[0])).build();
+        return User.builder()
+                .username(users.getLoginId())
+                .password(encodedPassword)
+                .authorities(users.getRoles().stream()
+                        .map(UserRole::toAuthority)
+                        .map(SimpleGrantedAuthority::new)
+                        .toList())
+                .build();
     }
 }
