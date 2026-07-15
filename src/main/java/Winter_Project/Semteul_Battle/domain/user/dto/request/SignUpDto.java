@@ -6,10 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
-import java.util.ArrayList;
-import java.util.List;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -21,10 +17,8 @@ public class SignUpDto {
     private String email;
     private String major;
     private String university;
-    @Builder.Default
-    private List<String> roles = new ArrayList<>();
 
-    public Users toEntity(String encodedPassword, List<String> roles) {
+    public Users toEntity(String encodedPassword) {
 
         return Users.builder()
                 .loginId(loginId)
@@ -33,7 +27,6 @@ public class SignUpDto {
                 .email(email)
                 .major(major)
                 .university(university)
-                .roles(roles)
                 .build();
     }
 }

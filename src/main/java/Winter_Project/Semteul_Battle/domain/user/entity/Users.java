@@ -3,7 +3,6 @@ package Winter_Project.Semteul_Battle.domain.user.entity;
 
 import Winter_Project.Semteul_Battle.domain.contest.entity.*;
 import Winter_Project.Semteul_Battle.domain.problem.entity.*;
-import Winter_Project.Semteul_Battle.domain.user.entity.*;
 import Winter_Project.Semteul_Battle.domain.menu.entity.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -86,32 +85,34 @@ public class Users implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles.stream()
+                .map(UserRole::toAuthority)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }
 
     @Override
     public String getUsername() {
-        return String.valueOf(this.id);
-}
-@Override
+        return this.loginId;
+    }
+
+    @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 
     public void saveProfileUrl(String fileUrl) {
