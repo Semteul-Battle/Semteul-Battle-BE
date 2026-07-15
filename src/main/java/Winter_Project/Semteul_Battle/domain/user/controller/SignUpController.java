@@ -27,18 +27,18 @@ public class SignUpController {
     private Map<String, Boolean> pass = new HashMap<>();
 
 
-@GetMapping("/id-check")
+    @GetMapping("/id-check")
     public boolean idCheck(@RequestParam("loginId") String loginId) {
 
-if (userRepository.existsByLoginId(loginId)) {
-return false;
+        if (userRepository.existsByLoginId(loginId)) {
+            return false;
         }
 
-return true;
+        return true;
     }
 
 
-@PostMapping("/send-email")
+    @PostMapping("/send-email")
     public boolean signUpEmail(@RequestBody MailDto mailDto) {
         String email = mailDto.getEmail();
 
@@ -53,7 +53,7 @@ return true;
     }
 
 
-@PostMapping("/verification")
+    @PostMapping("/verification")
     public boolean verifyCode(@RequestBody MailDto mailDto) {
 
         String storedValue = redisUtil.getData(mailDto.getEmail());
@@ -61,12 +61,12 @@ return true;
         if (storedValue != null && storedValue.equals(UserCode)) {
             return true;
         } else {
-return false;
+            return false;
         }
     }
 
 
-@PostMapping("/sign-up")
+    @PostMapping("/sign-up")
     public boolean signUp(@RequestBody SignUpDto signUpDto) {
         if (signUpDto.getLoginId() != null && signUpDto.getPassword() != null && signUpDto.getName() != null && signUpDto.getEmail() != null && signUpDto.getMajor() != null && "pass".equals(redisUtil.getData(signUpDto.getEmail()))) {
             UserDto savedUserDto = userService.signUp(signUpDto);

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
@@ -33,15 +35,44 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/menu/**").permitAll()
-                        .requestMatchers("/upload").permitAll()
-                        .requestMatchers("/users/**").permitAll()
-                        .requestMatchers("/contests/**").permitAll()
-                        .requestMatchers("/submit/**").permitAll()
-                        .requestMatchers("/contest/contestCreate").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/contest/contestDelete/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/**").hasAnyAuthority("ROLE_ADMIN")
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+                        .requestMatchers(
+                                "/users/sign-in",
+                                "/users/sign-up",
+                                "/users/id-check",
+                                "/users/send-email",
+                                "/users/verification",
+                                "/users/send",
+                                "/users/find",
+                                "/users/update",
+                                "/users/renewalToken"
+                        ).permitAll()
+                        .requestMatchers(
+                                "/contests/all",
+                                "/contests/ongoing",
+                                "/contests/scheduled",
+                                "/contests/finished",
+                                "/menu/inquiryNotice",
+                                "/menu/inquiryQuestion",
+                                "/menu/inquiryComment"
+                        ).permitAll()
+                        .requestMatchers(
+                                "/contest/id-designate",
+                                "/contest/contestCreate",
+                                "/contest/contestDelete/**"
+                        ).hasRole("ADMIN")
+                        .requestMatchers(
+                                "/users/**",
+                                "/contests/**",
+                                "/contest/**",
+                                "/submit/**",
+                                "/menu/**",
+                                "/upload"
+                        ).authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
