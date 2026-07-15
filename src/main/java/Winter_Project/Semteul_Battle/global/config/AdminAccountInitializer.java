@@ -59,6 +59,10 @@ public class AdminAccountInitializer implements ApplicationRunner {
             return;
         }
 
+        userRepository.findByEmail(adminEmail).ifPresent(user -> {
+            throw new IllegalStateException("ADMIN_EMAIL is already used by another account: " + adminEmail);
+        });
+
         Users admin = Users.builder()
                 .loginId(adminLoginId)
                 .password(passwordEncoder.encode(adminPassword))
