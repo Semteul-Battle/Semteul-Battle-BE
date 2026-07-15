@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,7 +69,11 @@ public class AdminAccountInitializer implements ApplicationRunner {
                 .roles(new ArrayList<>(List.of(UserRole.ADMIN.name())))
                 .build();
 
-        userRepository.save(admin);
-        log.info("admin account initialized: {}", adminLoginId);
+        try {
+            userRepository.save(admin);
+            log.info("admin account initialized: {}", adminLoginId);
+        } catch (DataIntegrityViolationException e) {
+            log.info("admin account already initialized by another process: {}", adminLoginId);
+        }
     }
 }

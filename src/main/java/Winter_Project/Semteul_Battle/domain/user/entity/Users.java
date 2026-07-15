@@ -31,7 +31,7 @@ public class Users implements UserDetails {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "login_id", nullable = false)
+    @Column(name = "login_id", nullable = false, unique = true)
     private String loginId;
 
     @Column(nullable = false)
@@ -42,7 +42,7 @@ public class Users implements UserDetails {
 
     private String major;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
