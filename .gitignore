@@ -6,6 +6,7 @@
 *.properties
 !docker-compose.yml
 !docker-compose.yaml
+!.coderabbit.yaml
 !gradle-wrapper.properties
 
 # Secrets / credentials
