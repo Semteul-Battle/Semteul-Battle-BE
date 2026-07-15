@@ -24,7 +24,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -74,17 +73,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public Users getUserByUsername(String loginId) {
         return userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new UserException(ErrorStatus._NOT_FOUND, "User not found with username: " + loginId));
+                .orElseThrow(() -> new UserException(ErrorStatus._NOT_FOUND, "사용자를 찾을 수 없습니다."));
     }
 
     @Override
     public UserInquiryDto getUserInformation(String loginId) {
-        Optional<Users> user = userRepository.findByLoginId(loginId);
+        Users user = getUserByUsername(loginId);
 
         UserInquiryDto userInquiryDto = new UserInquiryDto();
-        userInquiryDto.setLoginId(user.get().getLoginId());
-        userInquiryDto.setName(user.get().getName());
-        userInquiryDto.setRole(user.get().getRoles().toString());
+        userInquiryDto.setLoginId(user.getLoginId());
+        userInquiryDto.setName(user.getName());
+        userInquiryDto.setRole(user.getRoles().toString());
         return userInquiryDto;
     }
 

@@ -12,6 +12,7 @@ import Winter_Project.Semteul_Battle.global.status.SuccessStatus;
 import Winter_Project.Semteul_Battle.global.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class SignUpController {
 
     private static final String VERIFIED = "pass";
+    private static final String SIGNUP_ID_KEY_PREFIX = "signup:id:";
+    private static final String SIGNUP_EMAIL_KEY_PREFIX = "signup:email:";
     private static final long SIGN_UP_STEP_TTL_SECONDS = 300L;
 
     private final UserService userService;
@@ -35,45 +38,81 @@ public class SignUpController {
 
     @GetMapping("/id-check")
     public BaseResponse<Boolean> idCheck(@RequestParam("loginId") String loginId) {
+        requireText(loginId, "아이디를 입력해주세요.");
+
         boolean available = !userRepository.existsByLoginId(loginId);
         if (available) {
-            redisUtil.setDataExpire(loginId, VERIFIED, SIGN_UP_STEP_TTL_SECONDS);
+            redisUtil.setDataExpire(signUpIdKey(loginId), VERIFIED, SIGN_UP_STEP_TTL_SECONDS);
         }
         return BaseResponse.onSuccess(SuccessStatus.OK, available);
     }
 
     @PostMapping("/send-email")
     public BaseResponse<Void> signUpEmail(@RequestBody MailDto mailDto) {
-        if (!VERIFIED.equals(redisUtil.getData(mailDto.getLoginId()))) {
+        requireMailFields(mailDto, true, false);
+
+        if (!VERIFIED.equals(redisUtil.getData(signUpIdKey(mailDto.getLoginId())))) {
             throw new UserException(ErrorStatus._BAD_REQUEST, "아이디 중복 확인이 필요합니다.");
         }
 
         MailDto signUpDto = emailService.signUpVerification(mailDto.getEmail());
         emailService.mailSend(signUpDto);
-        redisUtil.setDataExpire(mailDto.getEmail(), signUpDto.getVerificationCode(), SIGN_UP_STEP_TTL_SECONDS);
+        redisUtil.setDataExpire(signUpEmailKey(mailDto.getEmail()), signUpDto.getVerificationCode(), SIGN_UP_STEP_TTL_SECONDS);
         return BaseResponse.onSuccess(SuccessStatus.OK, null);
     }
 
     @PostMapping("/verification")
     public BaseResponse<Void> verifyCode(@RequestBody MailDto mailDto) {
-        String storedValue = redisUtil.getData(mailDto.getEmail());
+        requireMailFields(mailDto, false, true);
+
+        String storedValue = redisUtil.getData(signUpEmailKey(mailDto.getEmail()));
         if (storedValue == null || !storedValue.equals(mailDto.getVerificationCode())) {
             throw new UserException(ErrorStatus._BAD_REQUEST, "이메일 인증 코드가 일치하지 않습니다.");
         }
 
-        redisUtil.setDataExpire(mailDto.getEmail(), VERIFIED, SIGN_UP_STEP_TTL_SECONDS);
+        redisUtil.setDataExpire(signUpEmailKey(mailDto.getEmail()), VERIFIED, SIGN_UP_STEP_TTL_SECONDS);
         return BaseResponse.onSuccess(SuccessStatus.OK, null);
     }
 
     @PostMapping("/sign-up")
     public BaseResponse<Void> signUp(@RequestBody SignUpDto signUpDto) {
-        if (!VERIFIED.equals(redisUtil.getData(signUpDto.getEmail()))) {
+        if (signUpDto == null || !StringUtils.hasText(signUpDto.getEmail())) {
+            throw new UserException(ErrorStatus._BAD_REQUEST, "회원가입 필수 정보를 입력해주세요.");
+        }
+
+        if (!VERIFIED.equals(redisUtil.getData(signUpEmailKey(signUpDto.getEmail())))) {
             throw new UserException(ErrorStatus._BAD_REQUEST, "이메일 인증이 필요합니다.");
         }
 
         userService.signUp(signUpDto);
-        redisUtil.deleteData(signUpDto.getLoginId());
-        redisUtil.deleteData(signUpDto.getEmail());
+        redisUtil.deleteData(signUpIdKey(signUpDto.getLoginId()));
+        redisUtil.deleteData(signUpEmailKey(signUpDto.getEmail()));
         return BaseResponse.onSuccess(SuccessStatus.CREATED, null);
+    }
+
+    private void requireMailFields(MailDto mailDto, boolean loginIdRequired, boolean codeRequired) {
+        if (mailDto == null || !StringUtils.hasText(mailDto.getEmail())) {
+            throw new UserException(ErrorStatus._BAD_REQUEST, "이메일을 입력해주세요.");
+        }
+        if (loginIdRequired) {
+            requireText(mailDto.getLoginId(), "아이디를 입력해주세요.");
+        }
+        if (codeRequired) {
+            requireText(mailDto.getVerificationCode(), "인증 코드를 입력해주세요.");
+        }
+    }
+
+    private void requireText(String value, String message) {
+        if (!StringUtils.hasText(value)) {
+            throw new UserException(ErrorStatus._BAD_REQUEST, message);
+        }
+    }
+
+    private String signUpIdKey(String loginId) {
+        return SIGNUP_ID_KEY_PREFIX + loginId;
+    }
+
+    private String signUpEmailKey(String email) {
+        return SIGNUP_EMAIL_KEY_PREFIX + email;
     }
 }

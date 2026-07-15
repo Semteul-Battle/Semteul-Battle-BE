@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/users")
 public class SignInOutController {
 
+    private static final String AUTH_REFRESH_KEY_PREFIX = "auth:refresh:";
     private static final long REFRESH_TOKEN_TTL_SECONDS = 86_400L;
 
     private final UserService userService;
@@ -34,7 +36,7 @@ public class SignInOutController {
     @PostMapping("/sign-in")
     public BaseResponse<JwtToken> signIn(@RequestBody SignInDto signInDto) {
         JwtToken jwtToken = userService.signIn(signInDto.getLoginId(), signInDto.getPassword());
-        redisUtil.setDataExpire(signInDto.getLoginId(), jwtToken.getRefreshToken(), REFRESH_TOKEN_TTL_SECONDS);
+        redisUtil.setDataExpire(refreshTokenKey(signInDto.getLoginId()), jwtToken.getRefreshToken(), REFRESH_TOKEN_TTL_SECONDS);
         log.info("login requested: {}", signInDto.getLoginId());
         return BaseResponse.onSuccess(SuccessStatus.OK, jwtToken);
     }
@@ -49,7 +51,7 @@ public class SignInOutController {
         }
 
         String accessToken = token.substring(7);
-        redisUtil.deleteData(loginId);
+        redisUtil.deleteData(refreshTokenKey(loginId));
 
         Long expiration = jwtTokenProvider.getExpiration(accessToken);
         redisUtil.setBlackList(accessToken, "access_token", expiration);
@@ -60,7 +62,7 @@ public class SignInOutController {
 
     @PostMapping("/renewalToken")
     public BaseResponse<JwtToken> renewalToken(@RequestHeader("Refresh-Token") String refreshToken) {
-        if (refreshToken == null || !refreshToken.startsWith("Bearer ")) {
+        if (!StringUtils.hasText(refreshToken) || !refreshToken.startsWith("Bearer ")) {
             throw new UserException(ErrorStatus._UNAUTHORIZED, "유효하지 않은 refresh token입니다.");
         }
 
@@ -70,13 +72,22 @@ public class SignInOutController {
         }
 
         String loginId = jwtTokenProvider.getLoginId(token);
-        String refreshTokenFromId = redisUtil.getData(loginId);
-        if (refreshTokenFromId == null || !refreshTokenFromId.equals(token)) {
-            throw new UserException(ErrorStatus._BAD_REQUEST, "저장된 refresh token이 없습니다.");
+        JwtToken jwtToken = userService.tokenRenewal(loginId);
+        boolean renewed = redisUtil.compareAndSetDataExpire(
+                refreshTokenKey(loginId),
+                token,
+                jwtToken.getRefreshToken(),
+                REFRESH_TOKEN_TTL_SECONDS
+        );
+
+        if (!renewed) {
+            throw new UserException(ErrorStatus._UNAUTHORIZED, "refresh token이 만료되었거나 이미 사용되었습니다.");
         }
 
-        JwtToken jwtToken = userService.tokenRenewal(loginId);
-        redisUtil.setDataExpire(loginId, jwtToken.getRefreshToken(), REFRESH_TOKEN_TTL_SECONDS);
         return BaseResponse.onSuccess(SuccessStatus.OK, jwtToken);
+    }
+
+    private String refreshTokenKey(String loginId) {
+        return AUTH_REFRESH_KEY_PREFIX + loginId;
     }
 }
