@@ -42,7 +42,7 @@ Semteul Battle은 알고리즘 문제 풀이 대회를 운영하고 참가할 �
   ├── response
   ├── status
   └── util
-
+```
   #### Package Rule
 
   - 도메인과 직접 관련된 코드는 domain/{domain} 내부에 작성합니다.
