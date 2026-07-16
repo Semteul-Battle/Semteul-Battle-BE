@@ -22,6 +22,9 @@ public class SubmitDTO {
     private Long id;
     private ProblemDTO problem;
 
+    @NotNull(message = "문제 ID를 입력해주세요.")
+    private Long problemId;
+
     @NotBlank(message = "언어를 입력해주세요.")
     private String language;
 
@@ -40,6 +43,7 @@ public class SubmitDTO {
     public static SubmitDTO from(Submit submit) {
         SubmitDTO dto = new SubmitDTO();
         dto.problem = ProblemDTO.from(submit.getProblem());
+        dto.problemId = submit.getProblem().getId();
         dto.language = submit.getLanguage();
         dto.runtime = submit.getRuntime();
         dto.time = submit.getTime();

@@ -1,8 +1,11 @@
 package Winter_Project.Semteul_Battle.domain.problem.service;
 
+import Winter_Project.Semteul_Battle.domain.problem.entity.Problem;
 import Winter_Project.Semteul_Battle.domain.problem.entity.ProblemImage;
+import Winter_Project.Semteul_Battle.domain.problem.exception.ProblemException;
 import Winter_Project.Semteul_Battle.domain.problem.repository.ProblemImageRepository;
 import Winter_Project.Semteul_Battle.domain.problem.repository.ProblemRepository;
+import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ public class UploadPictureServiceImpl implements UploadPictureService {
 
 
 public List<String> uploadPictures(List<MultipartFile> files, Long problemId) throws IOException {
+        Problem problem = getProblem(problemId);
         List<String> imageUrls = new ArrayList<>();
         for (MultipartFile file : files) {
             String fileName = file.getOriginalFilename();
@@ -39,7 +43,7 @@ public List<String> uploadPictures(List<MultipartFile> files, Long problemId) th
 
 
 ProblemImage problemImage = new ProblemImage();
-            problemImage.assignProblem(problemRepository.findById(problemId).orElse(null));
+            problemImage.assignProblem(problem);
             problemImage.updateImageUrl(fileUrl);
             problemImageRepository.save(problemImage);
         }
@@ -48,6 +52,7 @@ ProblemImage problemImage = new ProblemImage();
 
 
 public List<String> updatePictures(List<MultipartFile> files, Long problemId) throws IOException {
+        Problem problem = getProblem(problemId);
 
 List<ProblemImage> existingImages = problemImageRepository.findByProblemId(problemId);
         for (ProblemImage existingImage : existingImages) {
@@ -70,12 +75,17 @@ List<String> newImageUrls = new ArrayList<>();
 
 
 ProblemImage problemImage = new ProblemImage();
-            problemImage.assignProblem(problemRepository.findById(problemId).orElse(null));
+            problemImage.assignProblem(problem);
             problemImage.updateImageUrl(fileUrl);
             problemImageRepository.save(problemImage);
         }
 
 
 return newImageUrls;
+    }
+
+    private Problem getProblem(Long problemId) {
+        return problemRepository.findById(problemId)
+                .orElseThrow(() -> new ProblemException(ErrorStatus._NOT_FOUND, "문제를 찾을 수 없습니다."));
     }
 }

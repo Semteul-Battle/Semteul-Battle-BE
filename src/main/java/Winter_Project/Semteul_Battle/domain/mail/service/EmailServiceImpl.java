@@ -6,11 +6,14 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
+
 @Service
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
+    private final SecureRandom secureRandom = new SecureRandom();
     private static final String FROM_EMAIL = "cham9561@naver.com";
 
     public MailDto certificationNumberIssued(String userEmail, String username) {
@@ -40,7 +43,7 @@ public class EmailServiceImpl implements EmailService {
 
         int idx;
         for (int i = 0; i < 6; i++) {
-            idx = (int) (source.length * Math.random());
+            idx = secureRandom.nextInt(source.length);
             str += source[idx];
         }
         return str;

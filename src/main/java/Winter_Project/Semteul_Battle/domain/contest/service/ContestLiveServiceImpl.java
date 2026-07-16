@@ -245,14 +245,16 @@ boolean hasPreviousPage = submitsPage.hasPrevious();
         );
 
 
-Long questionerId = contestQuestionDTO.getUserId();
-        Optional<Users> questionerOptional = userRepository.findById(questionerId);
-        questionerOptional.ifPresent(contestQuestion::assignQuestioner);
+        Long questionerId = contestQuestionDTO.getUserId();
+        Users questioner = userRepository.findById(questionerId)
+                .orElseThrow(() -> new ContestException(ErrorStatus._NOT_FOUND, "User not found with id: " + questionerId));
+        contestQuestion.assignQuestioner(questioner);
 
 
-Long contestId = contestQuestionDTO.getContestId();
-        Optional<Contest> contestOptional = contestRepository.findById(contestId);
-        contestOptional.ifPresent(contestQuestion::assignContest);
+        Long contestId = contestQuestionDTO.getContestId();
+        Contest contest = contestRepository.findById(contestId)
+                .orElseThrow(() -> new ContestException(ErrorStatus._NOT_FOUND, "Contest not found with id: " + contestId));
+        contestQuestion.assignContest(contest);
 
         contestQuestionRepository.save(contestQuestion);
     }

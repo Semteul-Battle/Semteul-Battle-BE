@@ -41,7 +41,8 @@ public class ContestQuestion {
     private Timestamp answerTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "questioner_id")
+    @JoinColumn(name = "questioner_id", nullable = false)
+    @NotNull(message = "질문자는 필수입니다.")
     private Users questioner;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -49,7 +50,8 @@ public class ContestQuestion {
     private Users answerer;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "contest_id")
+    @JoinColumn(name = "contest_id", nullable = false)
+    @NotNull(message = "대회 정보는 필수입니다.")
     private Contest contestId;
 
     public void registerQuestion(String question, String content, Timestamp questionTime) {
