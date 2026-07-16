@@ -1,9 +1,11 @@
 package Winter_Project.Semteul_Battle.domain.contest.dto.response.page;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class Page {
 

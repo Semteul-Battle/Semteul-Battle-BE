@@ -86,9 +86,7 @@ if (!notice.getUsers().getLoginId().equals(loginId)) {
         }
 
 
-        notice.setTitle(noticeUpdateDto.getTitle());
-        notice.setContent(noticeUpdateDto.getContent());
-        notice.setTime(noticeUpdateDto.getTime());
+        notice.updateNotice(noticeUpdateDto.getTitle(), noticeUpdateDto.getContent(), noticeUpdateDto.getTime());
 
 
 return menuNoticeRepository.save(notice);

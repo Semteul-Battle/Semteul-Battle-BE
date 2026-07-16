@@ -1,17 +1,18 @@
 package Winter_Project.Semteul_Battle.domain.contest.dto.request;
 
-import Winter_Project.Semteul_Battle.domain.contest.entity.Contest;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
-@Data
+@Getter
+@Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class ContestApplicationDto {
+    @NotBlank(message = "대회 이름을 입력해주세요.")
     private String contestName;
 }

@@ -9,6 +9,7 @@ import Winter_Project.Semteul_Battle.global.security.jwt.JwtTokenProvider;
 import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
 import Winter_Project.Semteul_Battle.global.status.SuccessStatus;
 import Winter_Project.Semteul_Battle.global.util.RedisUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,7 +35,7 @@ public class SignInOutController {
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/sign-in")
-    public BaseResponse<JwtToken> signIn(@RequestBody SignInDto signInDto) {
+    public BaseResponse<JwtToken> signIn(@RequestBody @Valid SignInDto signInDto) {
         JwtToken jwtToken = userService.signIn(signInDto.getLoginId(), signInDto.getPassword());
         redisUtil.setDataExpire(refreshTokenKey(signInDto.getLoginId()), jwtToken.getRefreshToken(), REFRESH_TOKEN_TTL_SECONDS);
         log.info("login requested: {}", signInDto.getLoginId());

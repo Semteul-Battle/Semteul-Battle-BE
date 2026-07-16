@@ -28,7 +28,7 @@ public class ContestApplicationServiceImpl implements ContestApplicationService 
         Optional<Users> optionalUser = userRepository.findByLoginId(loginId);
 
 Contestant contestant = new Contestant();
-        contestant.setUsers(optionalUser.get());
+        contestant.assignUser(optionalUser.get());
 
 
 Optional<Contest> ContestName = contestRepository.findByContestName(contestApplicationDto.getContestName());
@@ -41,8 +41,8 @@ Optional<Contest> ContestName = contestRepository.findByContestName(contestAppli
 
 
 ContestantContest contestantContest = new ContestantContest();
-        contestantContest.setContest(contest);
-        contestantContest.setContestant(savedContestant);
+        contestantContest.assignContest(contest);
+        contestantContest.assignContestant(savedContestant);
 
 
 return true;

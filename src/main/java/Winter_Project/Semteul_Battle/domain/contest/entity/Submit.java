@@ -7,6 +7,8 @@ import Winter_Project.Semteul_Battle.domain.problem.entity.*;
 import Winter_Project.Semteul_Battle.domain.user.entity.*;
 import Winter_Project.Semteul_Battle.domain.menu.entity.*;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.sql.Timestamp;
@@ -15,7 +17,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Builder
 @Entity
-@Data
+@Getter
 public class Submit {
 
     @Id
@@ -23,22 +25,27 @@ public class Submit {
     @Column(updatable = false, unique = true, nullable = false)
     private Long id;
     @Column(nullable= false)
-private String language;
+    @NotBlank(message = "언어는 필수입니다.")
+    private String language;
 
     @Column(nullable= false)
-private Long runtime;
+    @NotNull(message = "실행 시간은 필수입니다.")
+    private Long runtime;
 
     @Column(nullable= false)
-private Long memoLimit;
+    @NotNull(message = "메모리 제한은 필수입니다.")
+    private Long memoLimit;
 
     @Column(nullable= false)
-private String code;
+    @NotBlank(message = "코드는 필수입니다.")
+    private String code;
 
     @Column(nullable= false)
-private Timestamp time;
+    @NotNull(message = "제출 시간은 필수입니다.")
+    private Timestamp time;
 
     @Column(nullable =true)
-private Long result;
+    private Long result;
 
 
 

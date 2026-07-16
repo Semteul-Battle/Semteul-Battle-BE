@@ -20,6 +20,7 @@ import Winter_Project.Semteul_Battle.domain.problem.service.UploadPictureService
 import Winter_Project.Semteul_Battle.global.response.BaseResponse;
 import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
 import Winter_Project.Semteul_Battle.global.status.SuccessStatus;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -55,7 +56,7 @@ public class ProblemController {
     private final UploadPictureService uploadPictureService;
 
     @PostMapping("/addProblem")
-    public boolean addProblem(@RequestBody AddProblemDto addProblemDto,
+    public boolean addProblem(@RequestBody @Valid AddProblemDto addProblemDto,
                               @AuthenticationPrincipal(expression = "username") String loginId) {
         validateExaminer(addProblemDto.getContestId(), loginId);
         addProblemService.problemFrame(addProblemDto);
@@ -63,7 +64,7 @@ public class ProblemController {
     }
 
     @PostMapping("/addIO")
-    public boolean addIO(@RequestBody AddIODto addIODto,
+    public boolean addIO(@RequestBody @Valid AddIODto addIODto,
                          @AuthenticationPrincipal(expression = "username") String loginId) {
         validateExaminer(addIODto.getContestId(), loginId);
         addIOService.IOFrame(addIODto);
@@ -71,7 +72,7 @@ public class ProblemController {
     }
 
     @DeleteMapping("/deleteProblem")
-    public boolean deleteProblem(@RequestBody DeleteProblemDto deleteProblemDto,
+    public boolean deleteProblem(@RequestBody @Valid DeleteProblemDto deleteProblemDto,
                                  @AuthenticationPrincipal(expression = "username") String loginId) {
         validateExaminer(deleteProblemDto.getContestId(), loginId);
         validateProblemTargets(deleteProblemDto.getContestId(), deleteProblemDto.getProblemId(), deleteProblemDto.getIoId());
@@ -81,7 +82,7 @@ public class ProblemController {
     }
 
     @PatchMapping("/updateProblem")
-    public boolean updateProblem(@RequestBody UpdateProblemDto updateProblemDto,
+    public boolean updateProblem(@RequestBody @Valid UpdateProblemDto updateProblemDto,
                                  @AuthenticationPrincipal(expression = "username") String loginId) {
         validateExaminer(updateProblemDto.getContestId(), loginId);
         validateProblemTargets(updateProblemDto.getContestId(), updateProblemDto.getProblemId(), updateProblemDto.getIoId());
@@ -91,7 +92,7 @@ public class ProblemController {
     }
 
     @PostMapping("/addFile")
-    public BaseResponse<Void> generateFiles(@RequestBody AddIOFileDto addIOFileDto,
+    public BaseResponse<Void> generateFiles(@RequestBody @Valid AddIOFileDto addIOFileDto,
                                             @AuthenticationPrincipal(expression = "username") String loginId) {
         validateExaminer(addIOFileDto.getContestId(), loginId);
         addProblemService.createInputOutputFiles(

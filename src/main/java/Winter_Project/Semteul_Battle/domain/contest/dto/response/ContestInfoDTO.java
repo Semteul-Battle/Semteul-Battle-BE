@@ -1,12 +1,9 @@
 package Winter_Project.Semteul_Battle.domain.contest.dto.response;
 
-import Winter_Project.Semteul_Battle.domain.contest.entity.ContestNotice;
-import Winter_Project.Semteul_Battle.domain.problem.entity.Problem;
 import lombok.*;
 
-import java.util.List;
-
-@Data
+@Getter
+@Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor

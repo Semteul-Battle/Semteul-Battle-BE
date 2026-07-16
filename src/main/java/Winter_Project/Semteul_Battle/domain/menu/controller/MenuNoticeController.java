@@ -11,6 +11,7 @@ import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
 import Winter_Project.Semteul_Battle.global.response.BaseResponse;
 import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
 import Winter_Project.Semteul_Battle.global.status.SuccessStatus;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,7 +40,7 @@ public class MenuNoticeController {
     @PostMapping("/createNotice")
     @ResponseStatus(HttpStatus.CREATED)
     public BaseResponse<Void> createNotice(
-            @RequestBody NoticeDto noticeDto,
+            @RequestBody @Valid NoticeDto noticeDto,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         Users users = getLoginUser(loginId);
@@ -58,7 +59,7 @@ public class MenuNoticeController {
 
     @PatchMapping("/updateNotice")
     public BaseResponse<Void> updateNotice(
-            @RequestBody NoticeUpdateDto noticeUpdateDto,
+            @RequestBody @Valid NoticeUpdateDto noticeUpdateDto,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         ensureLoginUser(loginId);
@@ -69,7 +70,7 @@ public class MenuNoticeController {
 
     @DeleteMapping("/deleteNotice")
     public BaseResponse<Void> deleteNotice(
-            @RequestBody NoticeDeleteDto noticeDeleteDto,
+            @RequestBody @Valid NoticeDeleteDto noticeDeleteDto,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         ensureLoginUser(loginId);

@@ -39,8 +39,8 @@ public List<String> uploadPictures(List<MultipartFile> files, Long problemId) th
 
 
 ProblemImage problemImage = new ProblemImage();
-            problemImage.setProblem(problemRepository.findById(problemId).orElse(null));
-problemImage.setImageUrl(fileUrl);
+            problemImage.assignProblem(problemRepository.findById(problemId).orElse(null));
+            problemImage.updateImageUrl(fileUrl);
             problemImageRepository.save(problemImage);
         }
         return imageUrls;
@@ -70,8 +70,8 @@ List<String> newImageUrls = new ArrayList<>();
 
 
 ProblemImage problemImage = new ProblemImage();
-            problemImage.setProblem(problemRepository.findById(problemId).orElse(null));
-problemImage.setImageUrl(fileUrl);
+            problemImage.assignProblem(problemRepository.findById(problemId).orElse(null));
+            problemImage.updateImageUrl(fileUrl);
             problemImageRepository.save(problemImage);
         }
 

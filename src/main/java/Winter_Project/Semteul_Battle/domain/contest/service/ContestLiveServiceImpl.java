@@ -10,6 +10,7 @@ import Winter_Project.Semteul_Battle.domain.user.entity.*;
 import Winter_Project.Semteul_Battle.domain.menu.entity.*;
 import Winter_Project.Semteul_Battle.domain.contest.dto.request.*;
 import Winter_Project.Semteul_Battle.domain.contest.dto.response.*;
+import Winter_Project.Semteul_Battle.domain.problem.dto.response.ProblemDetailResponseDto;
 import Winter_Project.Semteul_Battle.domain.contest.repository.*;
 import Winter_Project.Semteul_Battle.domain.problem.repository.*;
 import Winter_Project.Semteul_Battle.domain.user.repository.*;
@@ -96,13 +97,15 @@ public List<ContestInfoDTO> getProblemsByContestId(Long contestId) {
     }
 
 
-public List<Problem> getProblemsInfo(Long contestId) {
-        return problemRepository.findByContest_Id(contestId);
+public List<ProblemDetailResponseDto> getProblemsInfo(Long contestId) {
+        return problemRepository.findByContest_Id(contestId).stream()
+                .map(ProblemDetailResponseDto::from)
+                .collect(Collectors.toList());
     }
 
 
 @Transactional(readOnly = false)
-    public List<ContestNotice> getContestNoticeByContestId(Long contestId, String tokenFromId) {
+    public List<ContestNoticeResponseDto> getContestNoticeByContestId(Long contestId, String tokenFromId) {
 
         Long userId = userRepository.findByLoginId(tokenFromId)
                 .orElseThrow(() -> new ContestException(ErrorStatus._NOT_FOUND, "User not found with loginId: " + tokenFromId))
@@ -111,30 +114,33 @@ public List<Problem> getProblemsInfo(Long contestId) {
 
         changeCheckIdByHeIs(userId);
 
-        return contestNoticeRepository.findByContest_Id(contestId);
+        return contestNoticeRepository.findByContest_Id(contestId).stream()
+                .map(ContestNoticeResponseDto::from)
+                .collect(Collectors.toList());
     }
 
 
 @Transactional(readOnly = false)
-    public ContestNotice saveContestNotice(ContestNoticeDTO contestNoticeDTO) {
+    public ContestNoticeResponseDto saveContestNotice(ContestNoticeDTO contestNoticeDTO) {
         ContestNotice contestNotice = new ContestNotice();
-
-        contestNotice.setTitle(contestNoticeDTO.getTitle());
-        contestNotice.setContent(contestNoticeDTO.getContent());
-        contestNotice.setTime(new Timestamp(System.currentTimeMillis()));
+        contestNotice.updateNotice(
+                contestNoticeDTO.getTitle(),
+                contestNoticeDTO.getContent(),
+                new Timestamp(System.currentTimeMillis())
+        );
 
         Contest contest = contestRepository.findById(contestNoticeDTO.getContestId()).orElseThrow(
                 () -> new ContestException(ErrorStatus._NOT_FOUND, "Contest not found with id: " + contestNoticeDTO.getContestId()));
-        contestNotice.setContest(contest);
+        contestNotice.assignContest(contest);
 
         Users user = userRepository.findById(contestNoticeDTO.getUserId()).orElseThrow(
                 () -> new ContestException(ErrorStatus._NOT_FOUND, "User not found with id: " + contestNoticeDTO.getUserId()));
-        contestNotice.setUsers(user);
+        contestNotice.assignUser(user);
 
 
         updateContestantsCheckedStatusByContestId(contestNoticeDTO.getContestId(), true);
 
-        return contestNoticeRepository.save(contestNotice);
+        return ContestNoticeResponseDto.from(contestNoticeRepository.save(contestNotice));
     }
 
 
@@ -178,7 +184,7 @@ Long contestantId = contestantContest.getContestant().getId();
         Optional<Contestant> optionalContestant = contestantRepository.findByUsersId(userId);
         if (optionalContestant.isPresent()) {
             Contestant contestant = optionalContestant.get();
-            contestant.setChecked(false);
+            contestant.changeChecked(false);
 contestantRepository.save(contestant);
 } else {
 
@@ -238,27 +244,31 @@ boolean hasPreviousPage = submitsPage.hasPrevious();
 
 
 @Transactional(readOnly = false)
-    public List<ContestQuestion> getQuestionsByContest(Contest contest) {
-        return contestQuestionRepository.findByContestId(contest);
+    public List<ContestQuestionResponseDto> getQuestionsByContest(Contest contest) {
+        return contestQuestionRepository.findByContestId(contest).stream()
+                .map(ContestQuestionResponseDto::from)
+                .collect(Collectors.toList());
     }
 
 
 @Transactional(readOnly = false)
     public void addQuestion(ContestQuestionDTO contestQuestionDTO) {
         ContestQuestion contestQuestion = new ContestQuestion();
-        contestQuestion.setQuestion(contestQuestionDTO.getQuestion());
-        contestQuestion.setContent(contestQuestionDTO.getContent());
-        contestQuestion.setQuestionTime(contestQuestionDTO.getQuestionTime());
+        contestQuestion.registerQuestion(
+                contestQuestionDTO.getQuestion(),
+                contestQuestionDTO.getContent(),
+                contestQuestionDTO.getQuestionTime()
+        );
 
 
 Long questionerId = contestQuestionDTO.getUserId();
         Optional<Users> questionerOptional = userRepository.findById(questionerId);
-        questionerOptional.ifPresent(contestQuestion::setQuestioner);
+        questionerOptional.ifPresent(contestQuestion::assignQuestioner);
 
 
 Long contestId = contestQuestionDTO.getContestId();
         Optional<Contest> contestOptional = contestRepository.findById(contestId);
-        contestOptional.ifPresent(contestQuestion::setContestId);
+        contestOptional.ifPresent(contestQuestion::assignContest);
 
         contestQuestionRepository.save(contestQuestion);
     }
@@ -282,9 +292,7 @@ Long contestId = contestQuestionDTO.getContestId();
         Users answerer = userRepository.findById(answererId)
                 .orElseThrow(() -> new ContestException(ErrorStatus._NOT_FOUND, "답변자를 찾을 수 없습니다."));
 
-        contestQuestion.setAnswerer(answerer);
-        contestQuestion.setAnswer(answerContent);
-        contestQuestion.setAnswerTime(answerTime);
+        contestQuestion.answer(answerer, answerContent, answerTime);
 
         contestQuestionRepository.save(contestQuestion);
         return "답변이 등록되었습니다.";

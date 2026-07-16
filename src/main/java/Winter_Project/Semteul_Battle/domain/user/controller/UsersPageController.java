@@ -77,7 +77,7 @@ public class UsersPageController {
             }
 
             String fileUrl = userPageService.uploadUserProfilePic(file);
-            user.setProfile(fileUrl);
+            user.saveProfileUrl(fileUrl);
             userRepository.save(user);
             return BaseResponse.onSuccess(SuccessStatus.OK, fileUrl);
         } catch (IOException e) {

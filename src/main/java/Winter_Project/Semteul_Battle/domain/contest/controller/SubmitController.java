@@ -5,6 +5,7 @@ import Winter_Project.Semteul_Battle.domain.contest.service.ContestLiveService;
 import Winter_Project.Semteul_Battle.domain.contest.service.SubmitService;
 import Winter_Project.Semteul_Battle.global.response.BaseResponse;
 import Winter_Project.Semteul_Battle.global.status.SuccessStatus;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,7 +25,7 @@ public class SubmitController {
 
     @PostMapping("/saveSubmit")
     public BaseResponse<Void> submitCode(
-            @RequestBody SubmitDTO submitDTO,
+            @RequestBody @Valid SubmitDTO submitDTO,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         contestLiveService.whoAreU(submitDTO.getContestId(), loginId);

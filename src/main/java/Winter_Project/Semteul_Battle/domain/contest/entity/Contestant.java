@@ -5,14 +5,14 @@ import Winter_Project.Semteul_Battle.domain.contest.entity.*;
 import Winter_Project.Semteul_Battle.domain.problem.entity.*;
 import Winter_Project.Semteul_Battle.domain.user.entity.*;
 import Winter_Project.Semteul_Battle.domain.menu.entity.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -26,16 +26,22 @@ public class Contestant {
 
 
     @Column(nullable = true)
-private boolean isChecked;
+    private boolean isChecked;
 
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "users_id", nullable = false)
+    @NotNull(message = "참가자는 필수입니다.")
     private Users users;
 
-
-    @JsonIgnore
     @OneToMany(mappedBy = "contestant")
     private List<ContestantContest> contestantContests;
+
+    public void changeChecked(boolean checked) {
+        this.isChecked = checked;
+    }
+
+    public void assignUser(Users users) {
+        this.users = users;
+    }
 }

@@ -3,6 +3,7 @@ package Winter_Project.Semteul_Battle.domain.contest.service;
 import Winter_Project.Semteul_Battle.domain.contest.entity.Contest;
 import Winter_Project.Semteul_Battle.domain.contest.entity.Examiner;
 import Winter_Project.Semteul_Battle.domain.contest.dto.response.ContestPageDto;
+import Winter_Project.Semteul_Battle.domain.contest.dto.response.ContestSummaryDto;
 import Winter_Project.Semteul_Battle.domain.contest.repository.ExaminerRepository;
 import org.springframework.data.domain.Page;
 
@@ -25,7 +26,9 @@ public class ContestPageServiceImpl implements ContestPageService {
 
     public ContestPageDto buildDTO(Page<Contest> contestPage, List<Long> examinerIds) {
         ContestPageDto contestDTO = new ContestPageDto();
-        contestDTO.setContests(contestPage.getContent());
+        contestDTO.setContests(contestPage.getContent().stream()
+                .map(ContestSummaryDto::from)
+                .collect(Collectors.toList()));
         contestDTO.setExaminerIds(examinerIds);
 
         contestDTO.setTotalPages(contestPage.getTotalPages());

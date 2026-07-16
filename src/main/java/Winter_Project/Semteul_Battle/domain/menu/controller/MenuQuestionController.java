@@ -11,6 +11,7 @@ import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
 import Winter_Project.Semteul_Battle.global.response.BaseResponse;
 import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
 import Winter_Project.Semteul_Battle.global.status.SuccessStatus;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,7 +40,7 @@ public class MenuQuestionController {
     @PostMapping("/createQuestion")
     @ResponseStatus(HttpStatus.CREATED)
     public BaseResponse<Void> createQuestion(
-            @RequestBody QuestionDto questionDto,
+            @RequestBody @Valid QuestionDto questionDto,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         Users users = getLoginUser(loginId);
@@ -58,7 +59,7 @@ public class MenuQuestionController {
 
     @PatchMapping("/updateQuestion")
     public BaseResponse<Void> updateQuestion(
-            @RequestBody QuestionUpdateDto questionUpdateDto,
+            @RequestBody @Valid QuestionUpdateDto questionUpdateDto,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         ensureLoginUser(loginId);
@@ -69,7 +70,7 @@ public class MenuQuestionController {
 
     @DeleteMapping("/deleteQuestion")
     public BaseResponse<Void> deleteQuestion(
-            @RequestBody QuestionDeleteDto questionDeleteDto,
+            @RequestBody @Valid QuestionDeleteDto questionDeleteDto,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         ensureLoginUser(loginId);

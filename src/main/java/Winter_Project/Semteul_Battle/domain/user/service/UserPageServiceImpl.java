@@ -87,7 +87,7 @@ List<Contestant> contestants = contestantRepository.findByUsers_Id(user.getId())
 
         if (userOptional.isPresent()) {
             Users user = userOptional.get();
-            user.setView(visible ? 1 : 0);
+            user.changeContestVisibility(visible);
         } else {
             throw new UserException(ErrorStatus._NOT_FOUND, "사용자를 찾을 수 없습니다.");
         }

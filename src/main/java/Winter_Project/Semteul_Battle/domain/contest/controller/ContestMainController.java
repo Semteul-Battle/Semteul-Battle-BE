@@ -5,19 +5,20 @@ import Winter_Project.Semteul_Battle.domain.contest.dto.request.ContestNoticeDTO
 import Winter_Project.Semteul_Battle.domain.contest.dto.request.ContestQuestionDTO;
 import Winter_Project.Semteul_Battle.domain.contest.dto.request.SubmitDTO;
 import Winter_Project.Semteul_Battle.domain.contest.dto.response.ContestInfoDTO;
+import Winter_Project.Semteul_Battle.domain.contest.dto.response.ContestNoticeResponseDto;
+import Winter_Project.Semteul_Battle.domain.contest.dto.response.ContestQuestionResponseDto;
 import Winter_Project.Semteul_Battle.domain.contest.dto.response.SubmitPageDto;
 import Winter_Project.Semteul_Battle.domain.contest.entity.Contest;
-import Winter_Project.Semteul_Battle.domain.contest.entity.ContestNotice;
-import Winter_Project.Semteul_Battle.domain.contest.entity.ContestQuestion;
 import Winter_Project.Semteul_Battle.domain.contest.exception.ContestException;
 import Winter_Project.Semteul_Battle.domain.contest.service.ContestLiveService;
 import Winter_Project.Semteul_Battle.domain.contest.service.ContestService;
-import Winter_Project.Semteul_Battle.domain.problem.entity.Problem;
+import Winter_Project.Semteul_Battle.domain.problem.dto.response.ProblemDetailResponseDto;
 import Winter_Project.Semteul_Battle.domain.user.entity.Users;
 import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
 import Winter_Project.Semteul_Battle.global.response.BaseResponse;
 import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
 import Winter_Project.Semteul_Battle.global.status.SuccessStatus;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -70,25 +71,25 @@ public class ContestMainController {
     }
 
     @GetMapping("/problemInfo")
-    public List<Problem> getProblemsInfo(
+    public List<ProblemDetailResponseDto> getProblemsInfo(
             @RequestParam Long contestId
     ) {
         return contestLiveService.getProblemsInfo(contestId);
     }
 
     @GetMapping("/contestNotice")
-    public List<ContestNotice> getContestNoticeByContestId(
+    public List<ContestNoticeResponseDto> getContestNoticeByContestId(
             @RequestParam Long contestId,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
-        List<ContestNotice> notices = contestLiveService.getContestNoticeByContestId(contestId, loginId);
+        List<ContestNoticeResponseDto> notices = contestLiveService.getContestNoticeByContestId(contestId, loginId);
         return notices != null ? notices : Collections.emptyList();
     }
 
     @PostMapping("/contestNoticeCreate")
     @ResponseStatus(HttpStatus.CREATED)
-    public ContestNotice createContestNotice(
-            @RequestBody ContestNoticeDTO contestNoticeDTO,
+    public ContestNoticeResponseDto createContestNotice(
+            @RequestBody @Valid ContestNoticeDTO contestNoticeDTO,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         Users user = getLoginUser(loginId);
@@ -131,7 +132,7 @@ public class ContestMainController {
     }
 
     @GetMapping("/questionsList/{contestId}")
-    public List<ContestQuestion> getQuestionsByContestId(
+    public List<ContestQuestionResponseDto> getQuestionsByContestId(
             @PathVariable Long contestId
     ) {
         Contest contest = contestService.getContestById(contestId);
@@ -141,7 +142,7 @@ public class ContestMainController {
     @PostMapping("/createQuestions")
     @ResponseStatus(HttpStatus.CREATED)
     public BaseResponse<Void> addQuestion(
-            @RequestBody ContestQuestionDTO contestQuestionDTO,
+            @RequestBody @Valid ContestQuestionDTO contestQuestionDTO,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         Users user = getLoginUser(loginId);
@@ -161,7 +162,7 @@ public class ContestMainController {
     @PostMapping("/QuestionAnswer")
     @ResponseStatus(HttpStatus.CREATED)
     public BaseResponse<Void> answerQuestion(
-            @RequestBody AnswerDTO answerDTO,
+            @RequestBody @Valid AnswerDTO answerDTO,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         Users answerer = getLoginUser(loginId);
