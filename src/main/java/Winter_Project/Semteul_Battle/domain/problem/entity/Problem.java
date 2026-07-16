@@ -52,7 +52,7 @@ public class Problem {
     private List<ProblemImage> images;
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contest_id", nullable = true)
     private Contest contest;
 

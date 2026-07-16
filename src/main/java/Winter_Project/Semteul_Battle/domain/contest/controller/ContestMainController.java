@@ -93,7 +93,7 @@ public class ContestMainController {
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         Users user = getLoginUser(loginId);
-        contestNoticeDTO.setUserId(user.getId());
+        contestNoticeDTO.assignUserId(user.getId());
         return contestLiveService.saveContestNotice(contestNoticeDTO);
     }
 
@@ -146,7 +146,7 @@ public class ContestMainController {
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         Users user = getLoginUser(loginId);
-        contestQuestionDTO.setUserId(user.getId());
+        contestQuestionDTO.assignUserId(user.getId());
         contestLiveService.addQuestion(contestQuestionDTO);
         return BaseResponse.onSuccess(SuccessStatus.CREATED, null);
     }
@@ -166,7 +166,7 @@ public class ContestMainController {
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         Users answerer = getLoginUser(loginId);
-        answerDTO.setAnswerer(answerer.getId());
+        answerDTO.assignAnswerer(answerer.getId());
         contestLiveService.answerQuestion(answerDTO);
         return BaseResponse.onSuccess(SuccessStatus.CREATED, null);
     }

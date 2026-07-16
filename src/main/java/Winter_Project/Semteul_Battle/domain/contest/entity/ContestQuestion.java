@@ -40,15 +40,15 @@ public class ContestQuestion {
     @Column(nullable = true)
     private Timestamp answerTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "questioner_id")
     private Users questioner;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "answerer_id", nullable = true)
     private Users answerer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contest_id")
     private Contest contestId;
 

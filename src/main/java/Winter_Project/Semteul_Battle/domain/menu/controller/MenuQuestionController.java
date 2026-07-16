@@ -44,7 +44,7 @@ public class MenuQuestionController {
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         Users users = getLoginUser(loginId);
-        questionDto.setTime(new Timestamp(System.currentTimeMillis()));
+        questionDto.recordWrittenAt(new Timestamp(System.currentTimeMillis()));
         questionService.createQuestion(questionDto, users);
         return BaseResponse.onSuccess(SuccessStatus.CREATED, null);
     }
@@ -63,7 +63,7 @@ public class MenuQuestionController {
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         ensureLoginUser(loginId);
-        questionUpdateDto.setTime(new Timestamp(System.currentTimeMillis()));
+        questionUpdateDto.recordUpdatedAt(new Timestamp(System.currentTimeMillis()));
         questionService.updateQuestion(questionUpdateDto, loginId);
         return BaseResponse.onSuccess(SuccessStatus.OK, null);
     }

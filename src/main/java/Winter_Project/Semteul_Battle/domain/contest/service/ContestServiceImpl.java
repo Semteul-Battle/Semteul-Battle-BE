@@ -79,24 +79,14 @@ return problemRepository.findByContest_Id(contestId);
 
 //
 public ContestInfoDTO getContestInfo(Long contestId, String loginId) {
-//
 ContestInfoDTO contestInfoDTO = new ContestInfoDTO();
-//
 
 Long participantStatus = contestLiveService.whoAreU(contestId, loginId);
-//        contestInfoDTO.setParticipantStatus(participantStatus);
-//
 
 List<Problem> problems = problemRepository.findByContest_Id(contestId);
-//        contestInfoDTO.setProblems(problems != null ? problems : Collections.emptyList());
-//
 
 List<ContestNotice> notices = contestNoticeRepository.findByContest_Id(contestId);
-//        contestInfoDTO.setNotices(notices != null ? notices : Collections.emptyList());
-//
-//
 return contestInfoDTO;
-//
 }
 @Transactional(readOnly = false)
     public Contest getContestById(Long contestId) {

@@ -22,7 +22,7 @@ public class ProblemImage {
 
     private String imageUrl;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "problem_id", nullable = false)
     @NotNull(message = "이미지 대상 문제는 필수입니다.")
     private Problem problem;

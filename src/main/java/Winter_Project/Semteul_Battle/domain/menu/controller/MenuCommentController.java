@@ -50,7 +50,7 @@ public class MenuCommentController {
         Users users = getLoginUser(loginId);
         MenuQuestion menuQuestion = menuQuestionRepository.findById(commentDto.getQuestionId())
                 .orElseThrow(() -> new MenuException(ErrorStatus._NOT_FOUND, "질문을 찾을 수 없습니다."));
-        commentDto.setTime(new Timestamp(System.currentTimeMillis()));
+        commentDto.recordWrittenAt(new Timestamp(System.currentTimeMillis()));
         commentService.createComment(commentDto, users, menuQuestion);
         return BaseResponse.onSuccess(SuccessStatus.CREATED, null);
     }
@@ -68,7 +68,7 @@ public class MenuCommentController {
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         ensureLoginUser(loginId);
-        commentUpdateDto.setTime(new Timestamp(System.currentTimeMillis()));
+        commentUpdateDto.recordUpdatedAt(new Timestamp(System.currentTimeMillis()));
         commentService.updateComment(commentUpdateDto, loginId);
         return BaseResponse.onSuccess(SuccessStatus.OK, null);
     }

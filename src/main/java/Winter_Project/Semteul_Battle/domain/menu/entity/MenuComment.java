@@ -34,12 +34,12 @@ public class MenuComment {
     @Column(nullable = true)
     private Timestamp time;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "users_id", nullable = false)
     @NotNull(message = "댓글 작성자는 필수입니다.")
     private Users users;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id", nullable = false)
     @NotNull(message = "댓글 대상 질문은 필수입니다.")
     private MenuQuestion menuQuestion;

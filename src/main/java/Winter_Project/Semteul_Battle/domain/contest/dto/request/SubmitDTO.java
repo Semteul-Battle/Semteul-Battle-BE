@@ -1,22 +1,22 @@
 package Winter_Project.Semteul_Battle.domain.contest.dto.request;
 
 import Winter_Project.Semteul_Battle.domain.contest.dto.response.ProblemDTO;
-
+import Winter_Project.Semteul_Battle.domain.contest.entity.Submit;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.sql.Timestamp;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class SubmitDTO {
 
     private Long id;
@@ -36,4 +36,15 @@ public class SubmitDTO {
 
     @NotNull(message = "대회 ID를 입력해주세요.")
     private Long contestId;
+
+    public static SubmitDTO from(Submit submit) {
+        SubmitDTO dto = new SubmitDTO();
+        dto.problem = ProblemDTO.from(submit.getProblem());
+        dto.language = submit.getLanguage();
+        dto.runtime = submit.getRuntime();
+        dto.time = submit.getTime();
+        dto.result = submit.getResult();
+        dto.userId = submit.getUsers().getId();
+        return dto;
+    }
 }

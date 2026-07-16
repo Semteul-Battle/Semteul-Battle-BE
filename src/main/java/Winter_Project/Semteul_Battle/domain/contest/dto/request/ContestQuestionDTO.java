@@ -1,20 +1,20 @@
 package Winter_Project.Semteul_Battle.domain.contest.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.sql.Timestamp;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class ContestQuestionDTO {
     private String token;
 
@@ -29,4 +29,8 @@ public class ContestQuestionDTO {
 
     @NotNull(message = "대회 ID를 입력해주세요.")
     private Long contestId;
+
+    public void assignUserId(Long userId) {
+        this.userId = userId;
+    }
 }

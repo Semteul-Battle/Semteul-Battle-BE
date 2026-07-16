@@ -44,7 +44,7 @@ public class MenuNoticeController {
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         Users users = getLoginUser(loginId);
-        noticeDto.setTime(new Timestamp(System.currentTimeMillis()));
+        noticeDto.recordWrittenAt(new Timestamp(System.currentTimeMillis()));
         noticeService.createNotice(noticeDto, users);
         return BaseResponse.onSuccess(SuccessStatus.CREATED, null);
     }
@@ -63,7 +63,7 @@ public class MenuNoticeController {
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         ensureLoginUser(loginId);
-        noticeUpdateDto.setTime(new Timestamp(System.currentTimeMillis()));
+        noticeUpdateDto.recordUpdatedAt(new Timestamp(System.currentTimeMillis()));
         noticeService.updateNotice(noticeUpdateDto, loginId);
         return BaseResponse.onSuccess(SuccessStatus.OK, null);
     }

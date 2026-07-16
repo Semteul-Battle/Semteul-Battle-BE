@@ -29,7 +29,7 @@ public class Contestant {
     private boolean isChecked;
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "users_id", nullable = false)
     @NotNull(message = "참가자는 필수입니다.")
     private Users users;

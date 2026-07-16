@@ -42,7 +42,7 @@ public class MenuQuestion {
     @NotNull(message = "질문 시간은 필수입니다.")
     private Timestamp time;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "users_id", nullable = false)
     private Users users;
 

@@ -1,6 +1,7 @@
 package Winter_Project.Semteul_Battle.domain.user.dto.request;
 
 import Winter_Project.Semteul_Battle.domain.user.entity.Users;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Getter
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class SignUpDto {
     @NotBlank(message = "아이디를 입력해주세요.")
     private String loginId;
@@ -33,7 +35,6 @@ public class SignUpDto {
     private String university;
 
     public Users toEntity(String encodedPassword) {
-
         return Users.builder()
                 .loginId(loginId)
                 .password(encodedPassword)

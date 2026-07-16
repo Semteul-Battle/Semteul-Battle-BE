@@ -37,7 +37,7 @@ public class MenuNotice {
     @Column(nullable = true)
     private Timestamp time;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "users_id", nullable = false)
     @NotNull(message = "공지 작성자는 필수입니다.")
     private Users users;

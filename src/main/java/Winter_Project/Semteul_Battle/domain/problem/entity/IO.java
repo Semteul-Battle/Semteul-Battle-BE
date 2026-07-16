@@ -28,7 +28,7 @@ public class IO {
     private String output;
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "problem_id", nullable = false)
     @NotNull(message = "입출력 대상 문제는 필수입니다.")
     private Problem problem;

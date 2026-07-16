@@ -208,23 +208,7 @@ public SubmitPageDto<SubmitDTO> getSubmitsWithProblems(Long contestId, Pageable 
         Page<Submit> submitsPage = submitRepository.findByContestId(contestId, pageable);
 
         List<SubmitDTO> submitDTOs = submitsPage.getContent().stream()
-                .map(submit -> {
-                    SubmitDTO submitDTO = new SubmitDTO();
-
-                    submitDTO.setLanguage(submit.getLanguage());
-                    submitDTO.setRuntime(submit.getRuntime());
-                    submitDTO.setTime(submit.getTime());
-                    submitDTO.setResult(submit.getResult());
-                    submitDTO.setUserId(submit.getUsers().getId());
-                    //
-                    ProblemDTO problemDTO = new ProblemDTO();
-                    problemDTO.setId(submit.getProblem().getId());
-                    problemDTO.setNumber(submit.getProblem().getNumber());
-
-
-                    submitDTO.setProblem(problemDTO);
-                    return submitDTO;
-                })
+                .map(SubmitDTO::from)
                 .collect(Collectors.toList());
 
 

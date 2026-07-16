@@ -22,12 +22,12 @@ public class ContestantContest {
     private Long id;
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contestant_id", nullable = false)
     @NotNull(message = "참가자 정보는 필수입니다.")
     private Contestant contestant;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contest_id", nullable = false)
     @NotNull(message = "대회 정보는 필수입니다.")
     private Contest contest;
