@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -66,6 +68,26 @@ public class RedisUtil {
         ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
         Duration expireDuration = Duration.ofSeconds(duration);
         valueOperations.set(key, value, expireDuration);
+    }
+
+    public boolean compareAndSetDataExpire(String key, String expectedValue, String newValue, long duration) {
+        String script = """
+                if redis.call('GET', KEYS[1]) == ARGV[1] then
+                    redis.call('SET', KEYS[1], ARGV[2], 'EX', ARGV[3])
+                    return 1
+                end
+                return 0
+                """;
+
+        DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>(script, Long.class);
+        Long result = stringRedisTemplate.execute(
+                redisScript,
+                Collections.singletonList(key),
+                expectedValue,
+                newValue,
+                String.valueOf(duration)
+        );
+        return Long.valueOf(1L).equals(result);
     }
 
     public void deleteData(String key) {
