@@ -1,17 +1,24 @@
 package Winter_Project.Semteul_Battle.domain.problem.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@Data
+@Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class AddIOFileDto {
+    @NotNull(message = "대회 ID를 입력해주세요.")
     private Long contestId;
+
+    @NotNull(message = "문제 ID를 입력해주세요.")
     private Long problemId;
+
     private String number;
     private String inputFile;
     private String outputFile;

@@ -4,8 +4,9 @@ package Winter_Project.Semteul_Battle.domain.user.entity;
 import Winter_Project.Semteul_Battle.domain.contest.entity.*;
 import Winter_Project.Semteul_Battle.domain.problem.entity.*;
 import Winter_Project.Semteul_Battle.domain.menu.entity.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
-@Data
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -29,20 +30,26 @@ public class Users implements UserDetails {
     private Long id;
 
     @Column(nullable = false)
+    @NotBlank(message = "이름은 필수입니다.")
     private String name;
 
     @Column(name = "login_id", nullable = false, unique = true)
+    @NotBlank(message = "로그인 아이디는 필수입니다.")
     private String loginId;
 
     @Column(nullable = false)
+    @NotBlank(message = "비밀번호는 필수입니다.")
     private String password;
 
     @Column(nullable = false)
+    @NotBlank(message = "대학교는 필수입니다.")
     private String university;
 
     private String major;
 
     @Column(nullable = false, unique = true)
+    @Email(message = "이메일 형식이 올바르지 않습니다.")
+    @NotBlank(message = "이메일은 필수입니다.")
     private String email;
 
     @Column(nullable = false)
@@ -54,27 +61,21 @@ public class Users implements UserDetails {
     private int view;
 
 
-    @JsonIgnore
     @OneToMany(mappedBy = "users")
     private List<Submit> submits;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "users")
     private List<Contestant> contestants;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "questioner")
     private List<ContestQuestion> questioner;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "answerer")
     private List<ContestQuestion> answerer;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "users")
     private List<ContestNotice> ContestNotices;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "users")
     private List<Examiner> Examiners;
 
@@ -119,5 +120,8 @@ public class Users implements UserDetails {
         this.profile = fileUrl;
     }
 
+    public void changeContestVisibility(boolean visible) {
+        this.view = visible ? 1 : 0;
+    }
 
 }

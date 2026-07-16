@@ -1,16 +1,13 @@
 package Winter_Project.Semteul_Battle.domain.user.dto.response;
 
-import Winter_Project.Semteul_Battle.domain.contest.entity.Contest;
 import Winter_Project.Semteul_Battle.domain.user.entity.Users;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
-import java.util.Base64;
 import java.util.List;
 
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserPageDto {
@@ -20,4 +17,15 @@ public class UserPageDto {
     private String major;
     private String profile;
     private List<ContestInfoDto> contestList;
+
+    public static UserPageDto from(Users user, List<ContestInfoDto> contestList) {
+        return new UserPageDto(
+                user.getName(),
+                user.getLoginId(),
+                user.getUniversity(),
+                user.getMajor(),
+                user.getProfile(),
+                contestList
+        );
+    }
 }

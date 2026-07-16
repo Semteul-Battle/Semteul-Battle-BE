@@ -19,8 +19,7 @@ public class UpdateIOServiceImpl implements UpdateIOService {
         if (optionalIO.isPresent()) {
             IO io = optionalIO.get();
 
-            io.setInput(updateProblemDto.getInputIO());
-            io.setOutput(updateProblemDto.getOutputIO());
+            io.updateIo(updateProblemDto.getInputIO(), updateProblemDto.getOutputIO());
 
             ioRepository.save(io);
             return true;

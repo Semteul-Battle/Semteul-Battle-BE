@@ -5,11 +5,12 @@ import Winter_Project.Semteul_Battle.domain.contest.dto.request.ContestNoticeDTO
 import Winter_Project.Semteul_Battle.domain.contest.dto.request.ContestQuestionDTO;
 import Winter_Project.Semteul_Battle.domain.contest.dto.request.SubmitDTO;
 import Winter_Project.Semteul_Battle.domain.contest.dto.response.ContestInfoDTO;
+import Winter_Project.Semteul_Battle.domain.contest.dto.response.ContestNoticeResponseDto;
+import Winter_Project.Semteul_Battle.domain.contest.dto.response.ContestQuestionResponseDto;
 import Winter_Project.Semteul_Battle.domain.contest.dto.response.SubmitPageDto;
 import Winter_Project.Semteul_Battle.domain.contest.entity.Contest;
 import Winter_Project.Semteul_Battle.domain.contest.entity.ContestNotice;
-import Winter_Project.Semteul_Battle.domain.contest.entity.ContestQuestion;
-import Winter_Project.Semteul_Battle.domain.problem.entity.Problem;
+import Winter_Project.Semteul_Battle.domain.problem.dto.response.ProblemDetailResponseDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -20,11 +21,11 @@ public interface ContestLiveService {
 
     List<ContestInfoDTO> getProblemsByContestId(Long contestId);
 
-    List<Problem> getProblemsInfo(Long contestId);
+    List<ProblemDetailResponseDto> getProblemsInfo(Long contestId);
 
-    List<ContestNotice> getContestNoticeByContestId(Long contestId, String tokenFromId);
+    List<ContestNoticeResponseDto> getContestNoticeByContestId(Long contestId, String tokenFromId);
 
-    ContestNotice saveContestNotice(ContestNoticeDTO contestNoticeDTO);
+    ContestNoticeResponseDto saveContestNotice(ContestNoticeDTO contestNoticeDTO);
 
     void deleteContestNotice(Long contestNoticeId);
 
@@ -36,7 +37,7 @@ public interface ContestLiveService {
 
     SubmitPageDto<SubmitDTO> getSubmitsWithProblems(Long contestId, Pageable pageable);
 
-    List<ContestQuestion> getQuestionsByContest(Contest contest);
+    List<ContestQuestionResponseDto> getQuestionsByContest(Contest contest);
 
     void addQuestion(ContestQuestionDTO contestQuestionDTO);
 

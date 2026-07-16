@@ -6,6 +6,7 @@ import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
 import Winter_Project.Semteul_Battle.domain.user.service.CustomUserDetailsService;
 import Winter_Project.Semteul_Battle.domain.mail.service.EmailService;
 import Winter_Project.Semteul_Battle.global.util.RedisUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,7 +28,7 @@ public class FindPasswordController {
 
 
 @PostMapping("/send")
-    public boolean sendEmail(@RequestBody MailDto mailDto) {
+    public boolean sendEmail(@RequestBody @Valid MailDto mailDto) {
         String email = mailDto.getEmail();
         String loginId = mailDto.getLoginId();
 
@@ -49,7 +50,7 @@ return false;
 
 
 @PostMapping("/find")
-    public boolean verifyCode(@RequestBody MailDto mailDto) {
+    public boolean verifyCode(@RequestBody @Valid MailDto mailDto) {
 
         String storedValue = redisUtil.getData(mailDto.getEmail());
         String UserCode = mailDto.getVerificationCode();
@@ -62,7 +63,7 @@ return false;
 
 
 @PutMapping("/update")
-    public boolean passwordUpdate(@RequestBody MailDto mailDto) {
+    public boolean passwordUpdate(@RequestBody @Valid MailDto mailDto) {
         String newPassword = mailDto.getPassword();
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 

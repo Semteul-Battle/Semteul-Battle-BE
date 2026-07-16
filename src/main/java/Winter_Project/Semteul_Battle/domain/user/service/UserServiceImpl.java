@@ -80,11 +80,7 @@ public class UserServiceImpl implements UserService {
     public UserInquiryDto getUserInformation(String loginId) {
         Users user = getUserByUsername(loginId);
 
-        UserInquiryDto userInquiryDto = new UserInquiryDto();
-        userInquiryDto.setLoginId(user.getLoginId());
-        userInquiryDto.setName(user.getName());
-        userInquiryDto.setRole(user.getRoles().toString());
-        return userInquiryDto;
+        return UserInquiryDto.from(user);
     }
 
     @Override

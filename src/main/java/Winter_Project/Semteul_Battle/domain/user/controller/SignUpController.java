@@ -10,6 +10,7 @@ import Winter_Project.Semteul_Battle.global.response.BaseResponse;
 import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
 import Winter_Project.Semteul_Battle.global.status.SuccessStatus;
 import Winter_Project.Semteul_Battle.global.util.RedisUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -48,7 +49,7 @@ public class SignUpController {
     }
 
     @PostMapping("/send-email")
-    public BaseResponse<Void> signUpEmail(@RequestBody MailDto mailDto) {
+    public BaseResponse<Void> signUpEmail(@RequestBody @Valid MailDto mailDto) {
         requireMailFields(mailDto, true, false);
 
         if (!VERIFIED.equals(redisUtil.getData(signUpIdKey(mailDto.getLoginId())))) {
@@ -62,7 +63,7 @@ public class SignUpController {
     }
 
     @PostMapping("/verification")
-    public BaseResponse<Void> verifyCode(@RequestBody MailDto mailDto) {
+    public BaseResponse<Void> verifyCode(@RequestBody @Valid MailDto mailDto) {
         requireMailFields(mailDto, false, true);
 
         String storedValue = redisUtil.getData(signUpEmailKey(mailDto.getEmail()));
@@ -75,7 +76,7 @@ public class SignUpController {
     }
 
     @PostMapping("/sign-up")
-    public BaseResponse<Void> signUp(@RequestBody SignUpDto signUpDto) {
+    public BaseResponse<Void> signUp(@RequestBody @Valid SignUpDto signUpDto) {
         if (signUpDto == null || !StringUtils.hasText(signUpDto.getEmail())) {
             throw new UserException(ErrorStatus._BAD_REQUEST, "회원가입 필수 정보를 입력해주세요.");
         }

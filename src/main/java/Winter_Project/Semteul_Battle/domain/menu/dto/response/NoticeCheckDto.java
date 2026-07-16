@@ -1,19 +1,19 @@
 package Winter_Project.Semteul_Battle.domain.menu.dto.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.sql.Timestamp;
 
-@Data
+@Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class NoticeCheckDto {
     private String loginId;
-private String title;
+    private String title;
     private String content;
     private Timestamp time;
 }

@@ -6,6 +6,7 @@ import Winter_Project.Semteul_Battle.domain.contest.service.ContestApplicationSe
 import Winter_Project.Semteul_Battle.global.response.BaseResponse;
 import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
 import Winter_Project.Semteul_Battle.global.status.SuccessStatus;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ public class ContestApplicationController {
     @PostMapping("/apply")
     @ResponseStatus(HttpStatus.CREATED)
     public BaseResponse<Void> applyContest(
-            @RequestBody ContestApplicationDto contestApplicationDto,
+            @RequestBody @Valid ContestApplicationDto contestApplicationDto,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         boolean result = contestApplicationService.applyContest(contestApplicationDto, loginId);

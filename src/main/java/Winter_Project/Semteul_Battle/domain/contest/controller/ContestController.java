@@ -12,6 +12,7 @@ import Winter_Project.Semteul_Battle.domain.user.service.UserService;
 import Winter_Project.Semteul_Battle.global.response.BaseResponse;
 import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
 import Winter_Project.Semteul_Battle.global.status.SuccessStatus;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.annotation.Secured;
@@ -47,7 +48,7 @@ public class ContestController {
     @Secured("ROLE_ADMIN")
     @Transactional
     @PostMapping("/contestCreate")
-    public BaseResponse<Void> contestCreate(@RequestBody CreateContestDto createContestDto) {
+    public BaseResponse<Void> contestCreate(@RequestBody @Valid CreateContestDto createContestDto) {
         try {
             Contest createdContest = contestService.createContest(createContestDto);
             Long contestId = createdContest.getId();

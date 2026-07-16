@@ -54,8 +54,7 @@ public MenuComment updateComment(CommentUpdateDto commentUpdateDto, String login
             throw new MenuException(ErrorStatus._FORBIDDEN, "댓글을 수정하거나 삭제할 권한이 없습니다.");
         }
 
-        comment.setContent(commentUpdateDto.getContent());
-        comment.setTime(commentUpdateDto.getTime());
+        comment.updateComment(commentUpdateDto.getContent(), commentUpdateDto.getTime());
 
         return menuCommentRepository.save(comment);
     }

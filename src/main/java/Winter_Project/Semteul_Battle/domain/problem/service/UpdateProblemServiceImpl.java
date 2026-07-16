@@ -22,12 +22,14 @@ if (optionalProblem.isPresent()) {
             Problem problem = optionalProblem.get();
 
 
-            problem.setTitle(updateProblemDto.getTitle());
-            problem.setContent(updateProblemDto.getContent());
-            problem.setInput(updateProblemDto.getInput());
-            problem.setOutput(updateProblemDto.getOutput());
-            problem.setTimeLimit(updateProblemDto.getTimeLimit());
-            problem.setScore(updateProblemDto.getScore());
+            problem.updateProblem(
+                    updateProblemDto.getTitle(),
+                    updateProblemDto.getContent(),
+                    updateProblemDto.getInput(),
+                    updateProblemDto.getOutput(),
+                    updateProblemDto.getTimeLimit(),
+                    updateProblemDto.getScore()
+            );
 
 
 problemRepository.save(problem);

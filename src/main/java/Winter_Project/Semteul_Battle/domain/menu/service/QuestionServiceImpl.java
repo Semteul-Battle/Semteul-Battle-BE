@@ -86,9 +86,7 @@ public MenuQuestion updateQuestion(QuestionUpdateDto questionUpdateDto, String l
             throw new MenuException(ErrorStatus._FORBIDDEN, "질문을 수정하거나 삭제할 권한이 없습니다.");
         }
 
-        question.setTitle(questionUpdateDto.getTitle());
-        question.setContent(questionUpdateDto.getContent());
-        question.setTime(questionUpdateDto.getTime());
+        question.updateQuestion(questionUpdateDto.getTitle(), questionUpdateDto.getContent(), questionUpdateDto.getTime());
 
         return menuQuestionRepository.save(question);
     }

@@ -3,6 +3,7 @@ package Winter_Project.Semteul_Battle.domain.contest.service;
 import Winter_Project.Semteul_Battle.domain.contest.entity.Contest;
 import Winter_Project.Semteul_Battle.domain.contest.entity.Examiner;
 import Winter_Project.Semteul_Battle.domain.contest.dto.response.ContestPageDto;
+import Winter_Project.Semteul_Battle.domain.contest.dto.response.ContestSummaryDto;
 import Winter_Project.Semteul_Battle.domain.contest.repository.ExaminerRepository;
 import org.springframework.data.domain.Page;
 
@@ -24,23 +25,21 @@ public class ContestPageServiceImpl implements ContestPageService {
     private final ExaminerRepository examinerRepository;
 
     public ContestPageDto buildDTO(Page<Contest> contestPage, List<Long> examinerIds) {
-        ContestPageDto contestDTO = new ContestPageDto();
-        contestDTO.setContests(contestPage.getContent());
-        contestDTO.setExaminerIds(examinerIds);
+        List<ContestSummaryDto> contests = contestPage.getContent().stream()
+                .map(ContestSummaryDto::from)
+                .collect(Collectors.toList());
+        Integer prevPage = contestPage.hasPrevious() ? contestPage.getNumber() - 1 : null;
+        Integer nextPage = contestPage.hasNext() ? contestPage.getNumber() + 1 : null;
 
-        contestDTO.setTotalPages(contestPage.getTotalPages());
-        contestDTO.setTotalItems(contestPage.getTotalElements());
-
-
-if (contestPage.hasPrevious()) {
-            contestDTO.setPrevPage(contestPage.getNumber() - 1);
-        }
-
-        if (contestPage.hasNext()) {
-            contestDTO.setNextPage(contestPage.getNumber() + 1);
-        }
-
-        return contestDTO;
+        return ContestPageDto.of(
+                contests,
+                examinerIds,
+                contestPage.getNumber(),
+                contestPage.getTotalPages(),
+                contestPage.getTotalElements(),
+                prevPage,
+                nextPage
+        );
     }
 
 

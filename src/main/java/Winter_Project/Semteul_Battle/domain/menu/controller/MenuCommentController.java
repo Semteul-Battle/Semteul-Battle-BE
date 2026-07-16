@@ -4,7 +4,7 @@ import Winter_Project.Semteul_Battle.domain.menu.dto.request.CommentDeleteDto;
 import Winter_Project.Semteul_Battle.domain.menu.dto.request.CommentDto;
 import Winter_Project.Semteul_Battle.domain.menu.dto.request.CommentUpdateDto;
 import Winter_Project.Semteul_Battle.domain.menu.dto.response.CommentCheckDto;
-import Winter_Project.Semteul_Battle.domain.menu.entity.MenuComment;
+import Winter_Project.Semteul_Battle.domain.menu.dto.response.MenuCommentResponseDto;
 import Winter_Project.Semteul_Battle.domain.menu.entity.MenuQuestion;
 import Winter_Project.Semteul_Battle.domain.menu.exception.MenuException;
 import Winter_Project.Semteul_Battle.domain.menu.repository.MenuQuestionRepository;
@@ -14,6 +14,7 @@ import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
 import Winter_Project.Semteul_Battle.global.response.BaseResponse;
 import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
 import Winter_Project.Semteul_Battle.global.status.SuccessStatus;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -43,36 +44,38 @@ public class MenuCommentController {
     @PostMapping("/createComment")
     @ResponseStatus(HttpStatus.CREATED)
     public BaseResponse<Void> createComment(
-            @RequestBody CommentDto commentDto,
+            @RequestBody @Valid CommentDto commentDto,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         Users users = getLoginUser(loginId);
         MenuQuestion menuQuestion = menuQuestionRepository.findById(commentDto.getQuestionId())
                 .orElseThrow(() -> new MenuException(ErrorStatus._NOT_FOUND, "질문을 찾을 수 없습니다."));
-        commentDto.setTime(new Timestamp(System.currentTimeMillis()));
+        commentDto.recordWrittenAt(new Timestamp(System.currentTimeMillis()));
         commentService.createComment(commentDto, users, menuQuestion);
         return BaseResponse.onSuccess(SuccessStatus.CREATED, null);
     }
 
     @GetMapping("/inquiryComment")
-    public List<MenuComment> getCommentsByQuestionId(@RequestBody CommentCheckDto commentCheckDto) {
-        return commentService.getCommentsFromQuestion(commentCheckDto.getQuestionId());
+    public List<MenuCommentResponseDto> getCommentsByQuestionId(@RequestBody @Valid CommentCheckDto commentCheckDto) {
+        return commentService.getCommentsFromQuestion(commentCheckDto.getQuestionId()).stream()
+                .map(MenuCommentResponseDto::from)
+                .toList();
     }
 
     @PatchMapping("/updateComment")
     public BaseResponse<Void> updateComment(
-            @RequestBody CommentUpdateDto commentUpdateDto,
+            @RequestBody @Valid CommentUpdateDto commentUpdateDto,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         ensureLoginUser(loginId);
-        commentUpdateDto.setTime(new Timestamp(System.currentTimeMillis()));
+        commentUpdateDto.recordUpdatedAt(new Timestamp(System.currentTimeMillis()));
         commentService.updateComment(commentUpdateDto, loginId);
         return BaseResponse.onSuccess(SuccessStatus.OK, null);
     }
 
     @DeleteMapping("/deleteComment")
     public BaseResponse<Void> deleteComment(
-            @RequestBody CommentDeleteDto commentDeleteDto,
+            @RequestBody @Valid CommentDeleteDto commentDeleteDto,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         ensureLoginUser(loginId);

@@ -1,6 +1,7 @@
 package Winter_Project.Semteul_Battle.domain.contest.service;
 
 import Winter_Project.Semteul_Battle.domain.contest.entity.*;
+import Winter_Project.Semteul_Battle.domain.contest.exception.ContestException;
 import Winter_Project.Semteul_Battle.domain.problem.entity.*;
 import Winter_Project.Semteul_Battle.domain.user.entity.*;
 import Winter_Project.Semteul_Battle.domain.menu.entity.*;
@@ -10,6 +11,7 @@ import Winter_Project.Semteul_Battle.domain.contest.repository.*;
 import Winter_Project.Semteul_Battle.domain.problem.repository.*;
 import Winter_Project.Semteul_Battle.domain.user.repository.*;
 import Winter_Project.Semteul_Battle.domain.menu.repository.*;
+import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
@@ -79,28 +81,19 @@ return problemRepository.findByContest_Id(contestId);
 
 //
 public ContestInfoDTO getContestInfo(Long contestId, String loginId) {
-//
 ContestInfoDTO contestInfoDTO = new ContestInfoDTO();
-//
 
 Long participantStatus = contestLiveService.whoAreU(contestId, loginId);
-//        contestInfoDTO.setParticipantStatus(participantStatus);
-//
 
 List<Problem> problems = problemRepository.findByContest_Id(contestId);
-//        contestInfoDTO.setProblems(problems != null ? problems : Collections.emptyList());
-//
 
 List<ContestNotice> notices = contestNoticeRepository.findByContest_Id(contestId);
-//        contestInfoDTO.setNotices(notices != null ? notices : Collections.emptyList());
-//
-//
 return contestInfoDTO;
-//
 }
 @Transactional(readOnly = false)
     public Contest getContestById(Long contestId) {
-        return contestRepository.findById(contestId).orElse(null);
+        return contestRepository.findById(contestId)
+                .orElseThrow(() -> new ContestException(ErrorStatus._NOT_FOUND, "Contest not found with id: " + contestId));
     }
 
 

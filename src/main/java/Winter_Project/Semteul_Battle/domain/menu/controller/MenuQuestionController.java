@@ -11,6 +11,7 @@ import Winter_Project.Semteul_Battle.domain.user.repository.UserRepository;
 import Winter_Project.Semteul_Battle.global.response.BaseResponse;
 import Winter_Project.Semteul_Battle.global.status.ErrorStatus;
 import Winter_Project.Semteul_Battle.global.status.SuccessStatus;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,11 +40,11 @@ public class MenuQuestionController {
     @PostMapping("/createQuestion")
     @ResponseStatus(HttpStatus.CREATED)
     public BaseResponse<Void> createQuestion(
-            @RequestBody QuestionDto questionDto,
+            @RequestBody @Valid QuestionDto questionDto,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         Users users = getLoginUser(loginId);
-        questionDto.setTime(new Timestamp(System.currentTimeMillis()));
+        questionDto.recordWrittenAt(new Timestamp(System.currentTimeMillis()));
         questionService.createQuestion(questionDto, users);
         return BaseResponse.onSuccess(SuccessStatus.CREATED, null);
     }
@@ -58,18 +59,18 @@ public class MenuQuestionController {
 
     @PatchMapping("/updateQuestion")
     public BaseResponse<Void> updateQuestion(
-            @RequestBody QuestionUpdateDto questionUpdateDto,
+            @RequestBody @Valid QuestionUpdateDto questionUpdateDto,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         ensureLoginUser(loginId);
-        questionUpdateDto.setTime(new Timestamp(System.currentTimeMillis()));
+        questionUpdateDto.recordUpdatedAt(new Timestamp(System.currentTimeMillis()));
         questionService.updateQuestion(questionUpdateDto, loginId);
         return BaseResponse.onSuccess(SuccessStatus.OK, null);
     }
 
     @DeleteMapping("/deleteQuestion")
     public BaseResponse<Void> deleteQuestion(
-            @RequestBody QuestionDeleteDto questionDeleteDto,
+            @RequestBody @Valid QuestionDeleteDto questionDeleteDto,
             @AuthenticationPrincipal(expression = "username") String loginId
     ) {
         ensureLoginUser(loginId);

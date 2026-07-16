@@ -1,17 +1,18 @@
 package Winter_Project.Semteul_Battle.domain.contest.dto.request;
 
-import Winter_Project.Semteul_Battle.domain.contest.entity.Contest;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.util.List;
-
-@Data
+@Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class ContestApplicationDto {
+    @NotBlank(message = "대회 이름을 입력해주세요.")
     private String contestName;
 }

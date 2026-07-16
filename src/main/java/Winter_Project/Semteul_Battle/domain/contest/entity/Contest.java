@@ -5,16 +5,16 @@ import Winter_Project.Semteul_Battle.domain.contest.entity.*;
 import Winter_Project.Semteul_Battle.domain.problem.entity.*;
 import Winter_Project.Semteul_Battle.domain.user.entity.*;
 import Winter_Project.Semteul_Battle.domain.menu.entity.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -26,15 +26,20 @@ public class Contest {
     private Long id;
 
     @Column(name = "name", nullable = false)
-private String contestName;
+    @NotBlank(message = "대회 이름은 필수입니다.")
+    private String contestName;
 
     @Column(name = "Authority", nullable = false)
-private Long enterAuthority;
-    @Column(nullable = false)
-private Timestamp startTime;
+    @NotNull(message = "대회 입장 권한은 필수입니다.")
+    private Long enterAuthority;
 
     @Column(nullable = false)
-private Timestamp endTime;
+    @NotNull(message = "대회 시작 시간은 필수입니다.")
+    private Timestamp startTime;
+
+    @Column(nullable = false)
+    @NotNull(message = "대회 종료 시간은 필수입니다.")
+    private Timestamp endTime;
 
     @Column(nullable = true)
     private String simpleInfo;
@@ -43,30 +48,24 @@ private Timestamp endTime;
     @Column(nullable = true)
     private Long contestHost;
     @Column(nullable = true)
-private byte[] solution;
+    private byte[] solution;
 
 
-    @JsonIgnore
     @OneToMany(mappedBy = "contest")
     private List<Problem> problems;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "contest")
     private List<ContestantContest> contestantContests;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "contest")
     private List<ContestNotice> ContestNotices;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "contest")
     private List<Examiner> examiner;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "contestId")
     private List<ContestQuestion> contestQuestions;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "contest")
     private List<Submit> submits;
 

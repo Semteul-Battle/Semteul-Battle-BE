@@ -47,37 +47,24 @@ public class UserPageServiceImpl implements UserPageService {
         }
 
         Users user = userOptional.get();
-        UserPageDto userPageDto = new UserPageDto();
-        userPageDto.setUserName(user.getName());
-        userPageDto.setLoginId(user.getLoginId());
-        userPageDto.setUniversity(user.getUniversity());
-        userPageDto.setMajor(user.getMajor());
-        userPageDto.setProfile(user.getProfile());
-
-
-boolean showContestVisibility = user.getView() == 1;
+        List<ContestInfoDto> contestInfoList = new ArrayList<>();
+        boolean showContestVisibility = user.getView() == 1;
 
 
 if (showContestVisibility) {
 List<Contestant> contestants = contestantRepository.findByUsers_Id(user.getId());
-            List<ContestInfoDto> contestInfoList = new ArrayList<>();
 
             for (Contestant contestant : contestants) {
                 List<ContestantContest> contestantContests = contestantContestRepository.findByContestant_Id(contestant.getId());
 
                 for (ContestantContest cc : contestantContests) {
                     Contest contest = cc.getContest();
-                    ContestInfoDto contestInfoDto = new ContestInfoDto();
-                    contestInfoDto.setContestName(contest.getContestName());
-                    contestInfoDto.setEnterAuthority(contest.getEnterAuthority());
-                    contestInfoList.add(contestInfoDto);
+                    contestInfoList.add(ContestInfoDto.of(contest.getContestName(), contest.getEnterAuthority()));
                 }
             }
-
-            userPageDto.setContestList(contestInfoList);
         }
 
-        return userPageDto;
+        return UserPageDto.from(user, contestInfoList);
     }
 
 
@@ -87,7 +74,7 @@ List<Contestant> contestants = contestantRepository.findByUsers_Id(user.getId())
 
         if (userOptional.isPresent()) {
             Users user = userOptional.get();
-            user.setView(visible ? 1 : 0);
+            user.changeContestVisibility(visible);
         } else {
             throw new UserException(ErrorStatus._NOT_FOUND, "사용자를 찾을 수 없습니다.");
         }

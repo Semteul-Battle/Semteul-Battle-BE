@@ -5,17 +5,17 @@ import Winter_Project.Semteul_Battle.domain.contest.entity.*;
 import Winter_Project.Semteul_Battle.domain.problem.entity.*;
 import Winter_Project.Semteul_Battle.domain.user.entity.*;
 import Winter_Project.Semteul_Battle.domain.menu.entity.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 
 @Entity
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -28,20 +28,24 @@ public class MenuComment {
 
 
     @Column(nullable = true)
-private String content;
+    private String content;
 
 
     @Column(nullable = true)
-private Timestamp time;
+    private Timestamp time;
 
-
-    @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "users_id", nullable = false)
+    @NotNull(message = "댓글 작성자는 필수입니다.")
     private Users users;
 
-    @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id", nullable = false)
+    @NotNull(message = "댓글 대상 질문은 필수입니다.")
     private MenuQuestion menuQuestion;
+
+    public void updateComment(String content, Timestamp time) {
+        this.content = content;
+        this.time = time;
+    }
 }

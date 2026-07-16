@@ -44,7 +44,7 @@ Long runtime = submitDTO.getRuntime();
         String code = submitDTO.getCode();
         Long result = submitDTO.getResult();
         Timestamp time = submitDTO.getTime();
-        Long problemId = submitDTO.getProblem().getId();
+        Long problemId = submitDTO.getProblemId();
         Long contestId = submitDTO.getContestId();
 Long userId = submitDTO.getUserId();
 
